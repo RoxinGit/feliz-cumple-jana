@@ -1886,6 +1886,43 @@
   }
   .white-asoma.asomada .bocadillo-white { opacity: 1; transform: none; }
   .white-cara.vigila img { width: 175px; left: -52px; top: -44px; }
+  /* Leo se asoma por el borde izquierdo */
+  .leo-asoma {
+    position: fixed;
+    left: -120px;
+    top: 30%;
+    z-index: 40;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transition: left 0.8s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .leo-asoma.asomada { left: -14px; }
+  .leo-cara {
+    position: relative;
+    display: block;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transform: rotate(14deg);
+    animation: ladear 2.6s ease-in-out infinite;
+  }
+  .leo-cara img { position: absolute; max-width: none; width: 148px; left: -8px; top: -58px; }
+  .leo-cara.beso img { width: 147px; left: -23px; top: -56px; }
+  .bocadillo-leo { left: 86px; right: auto; bottom: 60px; max-width: 190px; border-radius: 14px 14px 14px 2px; transform-origin: bottom left; }
+  .leo-asoma.asomada .bocadillo-leo { opacity: 1; transform: none; }
+  .leo-asoma.pulsado .leo-cara { animation: bleh 0.6s ease; }
+  @media (max-width: 480px) {
+    .leo-cara { width: 74px; height: 74px; }
+    .leo-cara img { width: 114px; left: -6px; top: -45px; }
+    .leo-cara.beso img { width: 113px; left: -18px; top: -43px; }
+    .bocadillo-leo { left: 64px; bottom: 50px; }
+    .leo-asoma.asomada { left: -8px; }
+  }
   @media (max-width: 480px) { .white-cara.vigila img { width: 135px; left: -41px; top: -34px; } }
   .white-asoma.sobornado .white-cara { animation: bleh 0.6s ease; }
   @media (max-width: 480px) {
@@ -4125,6 +4162,10 @@
     </svg>
     <span class="bocadillo bocadillo-izq" id="bocadillo-manquita">¡Ey, manquita! 🎮</span>
   </button>
+  <button class="leo-asoma" id="leo-asoma" type="button" aria-label="Leo se asoma">
+    <span class="leo-cara"><img src="assets/leo-gracioso.webp" alt=""></span>
+    <span class="bocadillo bocadillo-leo" id="bocadillo-leo">Psst… te amo ❤️</span>
+  </button>
   <button class="white-asoma" id="white-asoma" type="button" aria-label="White se asoma">
     <span class="white-cara"><img src="assets/white.webp" alt=""></span>
     <span class="bocadillo bocadillo-white" id="bocadillo-white">¡Mamá! Un extraño está entrando a casa 😱</span>
@@ -4767,6 +4808,56 @@
     logro("manquita", "🎮", "Manquita oficial: Leo te enseñará a jugar bien");
     const c = centro(manquita);
     lanzarParticulas(c.x + 30, c.y, { cantidad: 40, colores: ["#b98cff", "#7fd16b", "#f6c667", "#5aa9e6", "#e0364f"], potencia: 0.9, vida: 150 });
+  });
+
+  // Leo: se asoma por la izquierda con mensajitos, alternando sus dos fotos
+  const leoAsoma = document.getElementById("leo-asoma");
+  const bocadilloLeo = document.getElementById("bocadillo-leo");
+  const caraLeo = leoAsoma.querySelector(".leo-cara");
+  const FRASES_LEO = [
+    ["gracioso", "¿Ya lo estás leyendo todo, mocosa? 👀"],
+    ["beso", "Psst… te amo ❤️"],
+    ["gracioso", "No te olvides de abrir la carta 💌"],
+    ["beso", "Feliz cumple, mi diablilla 🎂😘"],
+    ["gracioso", "Yo no sé cocinar, pero sé pedir sushi 🍣😎"],
+    ["beso", "Un besito por cada sección que veas 💋"],
+    ["gracioso", "¿Otra vez despierta? A dormir, mapachita 😤🦝"],
+    ["beso", "Eres mi destino favorito ❤️‍🔥"],
+  ];
+  let fraseLeo = 0;
+  function asomarLeo() {
+    const [foto, frase] = FRASES_LEO[fraseLeo++ % FRASES_LEO.length];
+    caraLeo.querySelector("img").src = `assets/leo-${foto}.webp`;
+    caraLeo.classList.toggle("beso", foto === "beso");
+    bocadilloLeo.textContent = frase;
+    leoAsoma.classList.add("asomada");
+    setTimeout(() => leoAsoma.classList.remove("asomada"), 6000);
+  }
+  setTimeout(asomarLeo, 14000);
+  setInterval(asomarLeo, 37000);
+  leoAsoma.addEventListener("click", () => {
+    leoAsoma.classList.add("asomada");
+    caraLeo.querySelector("img").src = "assets/leo-beso.webp";
+    caraLeo.classList.add("beso");
+    leoAsoma.classList.remove("pulsado");
+    void leoAsoma.offsetWidth;
+    leoAsoma.classList.add("pulsado");
+    bocadilloLeo.textContent = "¡Me pillaste! Toma, un beshito de regalo 💋";
+    const c = centro(leoAsoma);
+    for (let i = 0; i < 8; i++) {
+      const b = document.createElement("span");
+      b.className = "beso-volador";
+      b.textContent = i % 2 ? "💋" : "❤️";
+      b.style.left = c.x + 30 + "px";
+      b.style.top = c.y + "px";
+      b.style.setProperty("--dx", Math.random() * 220 + "px");
+      b.style.setProperty("--rot", (Math.random() - 0.5) * 60 + "deg");
+      b.style.animationDelay = i * 0.07 + "s";
+      document.body.append(b);
+      setTimeout(() => b.remove(), 2000);
+    }
+    logro("coquito", "😘", "Coquito pillado: beshito sorpresa");
+    setTimeout(() => leoAsoma.classList.remove("asomada"), 4500);
   });
 
   // White: avisa del "extraño"… hasta que lo sobornan con galletas
