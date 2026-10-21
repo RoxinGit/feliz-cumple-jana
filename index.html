@@ -3309,7 +3309,7 @@
         <div class="unidad"><strong id="c-minutos">0</strong><span>min</span></div>
         <div class="unidad seg"><strong id="c-segundos">0</strong><span>seg</span></div>
       </div>
-      <div class="barra-mes" aria-hidden="true"><span id="barra-mes"></span></div>
+
       <p class="contador-extra" id="contador-extra"></p>
     </div>
 
@@ -4210,17 +4210,11 @@
     ponerValor("c-minutos", minutos);
     ponerValor("c-segundos", String(segundos).padStart(2, "0"));
 
-    // Barra: cuánto falta para el próximo mesesario (cada día 24)
-    const siguiente = new Date(INICIO);
-    siguiente.setMonth(INICIO.getMonth() + meses + 1);
-    const progreso = (ahora - ancla) / (siguiente - ancla);
-    document.getElementById("barra-mes").style.width = (progreso * 100).toFixed(2) + "%";
     const totalDias = Math.floor((ahora - INICIO) / DIA);
-    const faltan = Math.ceil((siguiente - ahora) / DIA);
     // Unos 70 latidos por minuto desde el primer día
     const latidos = Math.floor(((ahora - INICIO) / MINUTO) * 70).toLocaleString("es-ES");
     document.getElementById("contador-extra").innerHTML =
-      `<strong>${totalDias}</strong> días queriéndote · <strong>${latidos}</strong> latidos tuyos · faltan <strong>${faltan}</strong> días para el mesesario nº ${meses + 1}`;
+      `<strong>${totalDias}</strong> días queriéndote · <strong>${latidos}</strong> latidos por ti<br>🎂 Y hoy, <strong>tu primer cumpleaños a mi lado</strong> (el primero de muchísimos)`;
     const mh = document.getElementById("meses-historia");
     if (mh) mh.textContent = `${meses} meses`;
   }
