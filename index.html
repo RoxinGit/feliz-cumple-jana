@@ -802,6 +802,48 @@
     line-height: 1.2;
   }
   @keyframes respirar-m { 50% { transform: scale(1.03, 0.97); } }
+
+  /* Mimos: animaciones extra */
+  .mimos-escena { position: relative; overflow: hidden; }
+  .panda { animation: balanceo-m 3.2s ease-in-out infinite; }
+  .oso { animation: balanceo-m 3.2s ease-in-out -1.6s infinite; }
+  @keyframes balanceo-m {
+    0%, 100% { transform: rotate(-2deg) scale(1, 1); }
+    50% { transform: rotate(2deg) scale(1.03, 0.97); }
+  }
+  .boca-beso { opacity: 0; transition: opacity 0.2s; }
+  .mimos-escena.beso .boca { opacity: 0; }
+  .mimos-escena.beso .boca-beso { opacity: 1; }
+  .mimos-escena.beso .panda { transform: rotate(8deg) scale(1.04, 0.96); }
+  .marca-beso { font-size: 18px; opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .mimos-escena.beso .marca-beso { animation: marca-beso 1.8s ease 0.35s forwards; }
+  @keyframes marca-beso {
+    0% { opacity: 0; transform: scale(0) rotate(-20deg); }
+    25% { opacity: 1; transform: scale(1.4) rotate(10deg); }
+    40% { transform: scale(1) rotate(0); }
+    85% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .brazo-abrazo { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 0.6s ease 0.2s; }
+  .brazo-abrazo.borde { stroke-dasharray: none; opacity: 0; }
+  .mimos-escena.abrazo .brazo-abrazo { stroke-dashoffset: 0; }
+  .mimos-escena.abrazo .panda, .mimos-escena.abrazo .oso { animation: apapacho 0.5s ease-in-out 0.6s 3 alternate; }
+  @keyframes apapacho { to { scale: 0.96 1.03; } }
+  .mimos-escena.masaje .rubor { animation: latido-svg 0.8s ease-in-out infinite; }
+  /* Corazones y notas que salen de la escena */
+  .flota-mimo {
+    position: absolute;
+    bottom: 30%;
+    font-size: 1.5rem;
+    pointer-events: none;
+    animation: flota-mimo 1.8s ease-out forwards;
+  }
+  @keyframes flota-mimo {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+    15% { opacity: 1; transform: translate(calc(var(--dx) * 0.2), -20px) scale(1.1); }
+    50% { transform: translate(calc(var(--dx) * -0.4), -90px) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), -190px) scale(0.8) rotate(var(--rot)); }
+  }
   @keyframes apretar { from { transform: translateY(0) scale(1); } to { transform: translateY(-5px) scale(0.85, 1.1); } }
   @keyframes balanceo { 50% { translate: 0 -6px; } }
 
@@ -3428,7 +3470,11 @@
           <path d="M190 94 q6 -6 12 0 M226 94 q6 -6 12 0" stroke="#3a2016" stroke-width="4" fill="none" stroke-linecap="round"/>
           <ellipse cx="186" cy="114" rx="10" ry="7" fill="#f0a04b"/><ellipse cx="242" cy="114" rx="10" ry="7" fill="#f0a04b"/>
           <path class="boca" d="M206 112 q4 5 8 0 q4 5 8 0" stroke="#3a2016" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <ellipse class="boca-beso" cx="210" cy="114" rx="4" ry="5" fill="#e0364f" stroke="#3a2016" stroke-width="2"/>
         </g>
+        <path class="brazo-abrazo" d="M190 150 Q150 186 100 172 Q74 164 70 140" pathLength="1" stroke="#a8693e" stroke-width="13" fill="none" stroke-linecap="round"/>
+        <path class="brazo-abrazo borde" d="M190 150 Q150 186 100 172 Q74 164 70 140" pathLength="1" stroke="#4a2a1a" stroke-width="3" fill="none" stroke-linecap="round" stroke-dasharray="0.02 0.98"/>
+        <text class="marca-beso" x="128" y="122">💋</text>
         <g class="manos">
           <circle cx="146" cy="196" r="10" fill="#a8693e" stroke="#4a2a1a" stroke-width="3"/>
           <circle cx="176" cy="196" r="10" fill="#a8693e" stroke="#4a2a1a" stroke-width="3"/>
@@ -4347,7 +4393,22 @@
       void escenaMimos.offsetWidth;
       escenaMimos.classList.add(tipo);
       clearTimeout(quitarMimo);
-      quitarMimo = setTimeout(() => escenaMimos.classList.remove(tipo), tipo === "masaje" ? 3500 : 1800);
+      quitarMimo = setTimeout(() => escenaMimos.classList.remove(tipo), tipo === "masaje" ? 3500 : tipo === "abrazo" ? 2800 : 2200);
+      // Corazones, besitos o notas que suben desde la escena
+      if (!reduceMotion) {
+        const EMOJIS = { beso: ["💋", "❤️", "💕"], abrazo: ["🤗", "💞", "❤️"], masaje: ["✨", "🎶", "💆‍♀️"] };
+        for (let i = 0; i < 9; i++) {
+          const f = document.createElement("span");
+          f.className = "flota-mimo";
+          f.textContent = EMOJIS[tipo][i % 3];
+          f.style.left = 30 + Math.random() * 40 + "%";
+          f.style.setProperty("--dx", (Math.random() - 0.5) * 120 + "px");
+          f.style.setProperty("--rot", (Math.random() - 0.5) * 60 + "deg");
+          f.style.animationDelay = i * 0.12 + "s";
+          escenaMimos.append(f);
+          setTimeout(() => f.remove(), 2000 + i * 120);
+        }
+      }
       const cuenta = btn.querySelector("span");
       cuenta.textContent = +cuenta.textContent + 1;
       totalMimos++;
