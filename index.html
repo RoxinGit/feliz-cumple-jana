@@ -1187,6 +1187,186 @@
     pointer-events: none;
   }
   .libro.pasando .hoja { animation: pasar 0.8s ease-in-out; }
+  /* Libro nuevo: tapa que se abre y hojas que giran en 3D */
+  .libreta-zona { position: relative; max-width: 620px; margin: 0 auto; perspective: 2000px; }
+  .libreta {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    aspect-ratio: 1.5;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7a2a45, #4a1428);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), inset 0 0 0 2px rgba(246, 198, 103, 0.3);
+    transform-style: preserve-3d;
+    touch-action: pan-y;
+    transition: transform 0.9s ease;
+  }
+  .libreta:not(.abierta) { transform: translateX(-25%) rotateX(8deg); }
+  @media (max-width: 480px) { .libreta { aspect-ratio: 1.05; } .libreta:not(.abierta) { transform: translateX(-25%); } }
+  .hoja-fija, .cara-giro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px;
+    text-align: center;
+    color: #3c1a2a;
+    background:
+      repeating-linear-gradient(to bottom, transparent 0 25px, rgba(201, 69, 106, 0.1) 25px 26px),
+      linear-gradient(90deg, #fdf0da, #fff8ea);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .hoja-fija.izq, .cara-giro.izq { border-radius: 6px 0 0 6px; box-shadow: inset -22px 0 26px -16px rgba(0, 0, 0, 0.35); }
+  .hoja-fija.der, .cara-giro.der { border-radius: 0 6px 6px 0; box-shadow: inset 22px 0 26px -16px rgba(0, 0, 0, 0.35); background: repeating-linear-gradient(to bottom, transparent 0 25px, rgba(201, 69, 106, 0.1) 25px 26px), linear-gradient(90deg, #fff8ea, #fdf0da); }
+  .dibujo { font-size: clamp(2.4rem, 10vw, 3.6rem); animation: flotar 2.4s ease-in-out infinite; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.15)); }
+  .cap-titulo { font-family: "Dancing Script", cursive; font-weight: 700; font-size: clamp(1.3rem, 5vw, 1.9rem); line-height: 1.1; color: #8a1f3c; }
+  .cap-titulo::after { content: "~ ♥ ~"; display: block; margin-top: 4px; font-family: var(--font-body); font-size: 0.7rem; letter-spacing: 0.3em; color: #c9456a; }
+  .texto-pag { margin: 0; font-family: "Dancing Script", cursive; font-size: clamp(1rem, 3.8vw, 1.3rem); line-height: 1.35; text-align: left; }
+  .capitular { float: left; margin: 2px 6px 0 0; font-family: var(--font-display); font-weight: 700; font-size: 2.6em; line-height: 0.8; color: #c9456a; }
+  .num-pag { position: absolute; bottom: 8px; font-size: 0.68rem; opacity: 0.5; }
+  .izq .num-pag { left: 14px; }
+  .der .num-pag { right: 14px; }
+  .lomo {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 50%;
+    width: 4px;
+    margin-left: -2px;
+    background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.35));
+    pointer-events: none;
+  }
+  .cinta {
+    position: absolute;
+    top: -6px;
+    right: 22%;
+    width: 14px;
+    height: 70px;
+    background: var(--ember);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+    opacity: 0;
+    transition: opacity 0.5s 0.8s;
+  }
+  .libreta.abierta .cinta { opacity: 1; animation: balanceo 3s ease-in-out infinite; }
+  /* Tapa */
+  .tapa {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50%;
+    z-index: 5;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+    transform-origin: left center;
+    transform-style: preserve-3d;
+    transition: transform 1.1s cubic-bezier(0.5, 0, 0.2, 1), visibility 0s 1.1s;
+  }
+  .libreta.abierta .tapa { transform: rotateY(-180deg); visibility: hidden; }
+  .tapa-frente, .tapa-dorso {
+    position: absolute;
+    inset: 0;
+    border-radius: 4px 10px 10px 4px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .tapa-frente {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 14px;
+    color: #f6c667;
+    text-align: center;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.12), transparent 50%),
+      linear-gradient(135deg, #8a2f50, #4a1428);
+    box-shadow: inset 0 0 0 6px #4a1428, inset 0 0 0 8px rgba(246, 198, 103, 0.6), 0 20px 40px rgba(0, 0, 0, 0.5);
+  }
+  .tapa-dorso { transform: rotateY(180deg); background: linear-gradient(135deg, #5a1a32, #3a0f20); }
+  .tapa-adorno { letter-spacing: 0.4em; font-size: 0.8rem; }
+  .tapa-titulo { font-family: "Dancing Script", cursive; font-weight: 700; font-size: clamp(1.4rem, 6vw, 2.2rem); line-height: 1.05; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3); }
+  .tapa-sub { font-family: var(--font-display); font-style: italic; font-size: 1rem; color: #ffd4de; }
+  .tapa-autor { font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
+  .tapa-pista { margin-top: 6px; padding: 4px 12px; border: 1px solid rgba(246, 198, 103, 0.6); border-radius: 999px; font-size: 0.72rem; font-weight: 800; animation: titila 1.6s steps(2, start) infinite; }
+  /* Hoja que gira */
+  .hoja-giro {
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: calc(50% - 10px);
+    z-index: 4;
+    transform-style: preserve-3d;
+    animation: 0.9s cubic-bezier(0.45, 0, 0.25, 1) forwards;
+  }
+  .hoja-giro.hacia-izq { left: 50%; transform-origin: left center; animation-name: girar-izq; }
+  .hoja-giro.hacia-der { left: 10px; transform-origin: right center; animation-name: girar-der; }
+  .cara-giro { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+  .dorso-giro { transform: rotateY(180deg); }
+  @keyframes girar-izq { from { transform: rotateY(0); } to { transform: rotateY(-180deg); } }
+  @keyframes girar-der { from { transform: rotateY(0); } to { transform: rotateY(180deg); } }
+  .libreta-controles { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 18px; }
+  .btn-pag {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    background: rgba(246, 198, 103, 0.12);
+    color: var(--gold);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.3s;
+  }
+  .btn-pag:active:not(:disabled) { transform: scale(0.9); }
+  .btn-pag:disabled { opacity: 0.3; cursor: default; }
+  .pag-indicador { min-width: 9em; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; color: var(--muted); }
+  .pluma { display: inline-block; transform-origin: 20% 90%; animation: escribir 0.9s ease-in-out infinite alternate; }
+  @keyframes escribir { from { transform: rotate(-12deg) translateX(-2px); } to { transform: rotate(8deg) translateX(3px); } }
+  .frase-atardecer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 8%;
+    z-index: 1;
+    margin: 0;
+    padding: 0 16px;
+    text-align: center;
+    font-family: "Dancing Script", cursive;
+    font-weight: 700;
+    font-size: clamp(1.3rem, 5vw, 2rem);
+    line-height: 1.1;
+    color: #fff3d6;
+    text-shadow: 0 2px 12px rgba(42, 14, 62, 0.8), 0 0 24px rgba(246, 198, 103, 0.6);
+    animation: frase-sol 8s ease-in-out infinite alternate;
+  }
+  @keyframes frase-sol { 0%, 15% { opacity: 0; transform: translateY(8px); } 45%, 100% { opacity: 1; transform: none; } }
+  .letras-vuelan { position: absolute; inset: 0; z-index: 6; pointer-events: none; }
+  .letras-vuelan span {
+    position: absolute;
+    top: 40%;
+    font-family: "Dancing Script", cursive;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(246, 198, 103, 0.6);
+    animation: letra-vuela 2s ease-out forwards;
+  }
+  .letras-vuelan span:nth-child(even) { color: var(--rose); }
+  @keyframes letra-vuela {
+    0% { opacity: 0; transform: translate(0, 0) scale(0.5); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--dx), -160px) scale(1.2) rotate(25deg); }
+  }
+
   .maquina {
     max-width: 560px;
     margin: 34px auto 0;
@@ -1468,6 +1648,46 @@
   }
   .manquita.asomada .bocadillo-izq { opacity: 1; transform: rotate(-18deg); }
 
+  /* White se asoma por el borde derecho, a media pantalla */
+  .white-asoma {
+    position: fixed;
+    right: -120px;
+    top: 42%;
+    z-index: 40;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    transition: right 0.8s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .white-asoma.asomada { right: -22px; }
+  .white-cara {
+    position: relative;
+    display: block;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    transform: rotate(-14deg);
+    animation: ladear 2.6s ease-in-out infinite;
+  }
+  .white-cara img { position: absolute; width: 175px; max-width: none; left: -64px; top: 0; }
+  .bocadillo-white {
+    right: 86px;
+    bottom: 60px;
+    max-width: 190px;
+  }
+  .white-asoma.asomada .bocadillo-white { opacity: 1; transform: none; }
+  .white-asoma.sobornado .white-cara { animation: bleh 0.6s ease; }
+  @media (max-width: 480px) {
+    .white-cara { width: 74px; height: 74px; }
+    .white-cara img { width: 135px; left: -49px; }
+    .bocadillo-white { right: 64px; bottom: 50px; }
+    .white-asoma.asomada { right: -8px; }
+  }
+
   /* Logros desbloqueados, estilo consola */
   .logros {
     position: fixed;
@@ -1718,6 +1938,37 @@
     pointer-events: none;
     animation: burla 1.6s ease forwards;
   }
+  .ojos-camaleon {
+    margin: 26px auto 0;
+    max-width: 520px;
+    padding: 14px;
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transform: rotate(-1deg);
+  }
+  .ojos-marco { position: relative; overflow: hidden; aspect-ratio: 2.7; margin: 8px 0; }
+  .ojos-marco img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 1.2s ease;
+  }
+  .ojos-marco.recorte img { object-position: 50% 8%; }
+  /* Foto propia de los ojos: acerca la zona de los ojos y deja fuera la tela de arriba */
+  .ojos-marco:not(.recorte) img { transform: scale(1.6); transform-origin: 30% 80%; }
+  /* Destello que recorre los ojos como un cambio de luz */
+  .ojos-marco::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-100%);
+    animation: barrido 5s ease-in-out infinite;
+    mix-blend-mode: overlay;
+  }
+  .btn-luz { margin-top: 10px; color: #3a2410; border-color: #c4233b; }
   .veredicto {
     margin: 22px 0 0;
     text-align: center;
@@ -2205,6 +2456,8 @@
   .carta-caja.abierta .carta p:nth-child(5) { transition-delay: 2.4s; }
   .carta-caja.abierta .carta p:nth-child(6) { transition-delay: 2.9s; }
   .carta-caja.abierta .carta p:nth-child(1) { transition-delay: 0.5s; }
+  .carta-caja.abierta .carta p:nth-child(7) { transition-delay: 3.4s; }
+  .carta-caja.abierta .carta p:nth-child(8) { transition-delay: 3.9s; }
 
   /* ===== Rediseño: general ===== */
   .seccion h2 {
@@ -2838,6 +3091,14 @@
         </button>
       </div>
       <p class="veredicto" id="veredicto" aria-live="polite">Veredicto pendiente…</p>
+      <div class="ojos-camaleon">
+        <p class="prueba-num">Prueba especial · los ojos camaleón</p>
+        <div class="ojos-marco" id="ojos-marco">
+          <img id="ojos-foto" src="assets/ojos.webp" alt="Los ojos de Jana" loading="lazy">
+        </div>
+        <p class="prueba-pie">La sospechosa declara que sus ojos cambian de color con la luz. El detective lo ha comprobado: es verdad, y todos son preciosos.</p>
+        <button class="btn-mimo btn-luz" id="btn-luz" type="button">💡 Cambiar la luz: <span id="nombre-luz">luz de día</span></button>
+      </div>
     </div>
   </section>
 
@@ -2951,14 +3212,33 @@
 
   <section class="seccion revelar" id="rincon">
     <h2>El rincón de mi escritora</h2>
-    <p class="intro">A ti que te encanta leer y escribir: un librito solo para ti. Toca para pasar la página.</p>
-    <button class="libro" id="libro" type="button" aria-label="Pasar página">
-      <span class="pagina izq"><span class="pag-texto" id="pag-izq"></span></span>
-      <span class="pagina der"><span class="pag-texto" id="pag-der"></span><span class="pag-num" id="pag-num"></span></span>
-      <span class="hoja" aria-hidden="true"></span>
-    </button>
+    <p class="intro">A ti que te encanta leer y escribir: un librito escrito solo para ti. Ábrelo y pasa las páginas.</p>
+    <div class="libreta-zona">
+      <div class="letras-vuelan" id="letras-vuelan" aria-hidden="true"></div>
+      <div class="libreta" id="libreta">
+        <div class="hoja-fija izq" id="hoja-izq"></div>
+        <div class="hoja-fija der" id="hoja-der"></div>
+        <span class="lomo" aria-hidden="true"></span>
+        <span class="cinta" aria-hidden="true"></span>
+        <button class="tapa" id="tapa" type="button" aria-label="Abrir el libro">
+          <span class="tapa-frente">
+            <span class="tapa-adorno">✦ ♥ ✦</span>
+            <span class="tapa-titulo">La historia de Jana</span>
+            <span class="tapa-sub">y su Coquito</span>
+            <span class="tapa-autor">Una edición única · 1 ejemplar</span>
+            <span class="tapa-pista">Toca para abrir</span>
+          </span>
+          <span class="tapa-dorso"></span>
+        </button>
+      </div>
+    </div>
+    <div class="libreta-controles">
+      <button class="btn-pag" id="pag-anterior" type="button" aria-label="Página anterior" disabled>‹</button>
+      <span class="pag-indicador" id="pag-indicador" aria-live="polite">Cerrado</span>
+      <button class="btn-pag" id="pag-siguiente" type="button" aria-label="Página siguiente" disabled>›</button>
+    </div>
     <div class="maquina">
-      <p class="maquina-tit">Ahora te toca a ti</p>
+      <p class="maquina-tit">Ahora te toca a ti <span class="pluma" aria-hidden="true">✒️</span></p>
       <p class="tecleado" id="tecleado" aria-live="polite"></p>
       <textarea id="cuaderno" rows="4" placeholder="Escríbele algo a tu Coquito..." aria-label="Tu nota"></textarea>
       <p class="pista-pareja">Se guarda en este dispositivo para que la sigas cuando quieras.</p>
@@ -2966,7 +3246,7 @@
   </section>
 
   <section class="seccion revelar" id="cocina">
-    <h2>La súper chef y su pinche</h2>
+    <h2>La súper chef y su ayudante</h2>
     <p class="intro">Tú cocinas de maravilla. Yo… no sé cocinar nada. Pero prometo ayudarte en lo que pueda (y comer muchísimo).</p>
     <div class="cocina">
       <svg class="chef" viewBox="0 0 160 200" aria-hidden="true">
@@ -3002,7 +3282,7 @@
       <figure class="curriculum">
         <img src="assets/leo-gracioso.webp" alt="Leo poniendo cara graciosa" loading="lazy">
         <figcaption>
-          <strong>Currículum del pinche</strong>
+          <strong>Currículum del ayudante</strong>
           <span>Experiencia en cocina: 0</span>
           <span>Habilidad: hervir agua (a veces)</span>
           <span>Ganas de comer: ∞</span>
@@ -3081,6 +3361,7 @@
     <p class="intro">Nuestro sitio favorito del mundo. Toca las conchitas de la orilla: cada una guarda un plan.</p>
     <div class="playa">
       <div class="sol" aria-hidden="true"></div>
+      <p class="frase-atardecer">No existe un atardecer más bonito que tú</p>
       <div class="gaviota" aria-hidden="true">︶︶</div>
       <div class="gaviota g2" aria-hidden="true">︶︶</div>
       <div class="mar" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -3260,11 +3541,13 @@
         <div>
           <div class="carta">
             <p>Mi Jana:</p>
-            <p>Hoy es tu día, y quería escribirte algo que siempre merezcas leer.</p>
-            <p>Eres mi luz, mi motivación para seguir adelante y mi persona favorita en todo el mundo. Desde aquella partida donde todo empezó hasta hoy, nunca dejé de sentir que encajamos como un rompecabezas: cada pieza tuya encuentra exactamente su lugar en mí.</p>
-            <p>Gracias por cada llamada hasta la madrugada, por cada audio que me alegra el día y por cuidar mis sueños aunque estemos lejos. Quiero celebrar muchos cumpleaños más contigo, con la playa, nuestros viajes y nuestros gatitos alrededor.</p>
-            <p>Feliz cumpleaños, diablilla. Te quiero más de lo que cabe en una pantalla.</p>
-            <p class="firma">Con todo mi amor</p>
+            <p>Hoy es tu día, y quería escribirte algo que merezcas leer siempre, una y otra vez.</p>
+            <p>Eres mi luz, mi motivación para seguir adelante y mi persona favorita en todo el mundo. Todo empezó en un juego, con tus historias y unas conversaciones en las que yo solo te mandaba gifs, stickers y memes… y casi pasaba de ti (guiño, guiño 😏). Y así, sin buscarlo, encontré el amor.</p>
+            <p>Hoy te amo tanto que todavía me sorprende. Lo nuestro es una conexión de almas gemelas, y me emociona pensar que voy a vivir toda mi vida al lado de una persona con un corazón tan bonito. Cada vez que escucho tu voz en una llamada, que te veo y que hablo con mi pechocha andaluza más hermosha del mundo, se me ilumina el día. Nunca dejé de sentir que encajamos como un rompecabezas: cada pieza tuya encuentra exactamente su lugar en mí.</p>
+            <p>Gracias por cada llamada hasta la madrugada (aunque luego te regañe para que te vayas a dormir, mi mapachita 🦝), por cada audio que me alegra el día y por cuidar mis sueños aunque nos separen 10 mil kilómetros.</p>
+            <p>Quiero celebrar muchísimos cumpleaños más contigo: con la playa, nuestros viajes, tu comida de súper chef, partidas eternas en las que te enseño a jugar, manquita, y White y nuestros gatitos alrededor.</p>
+            <p>Feliz cumpleaños, mi mocosa diablilla morenita. Te quiero hoy, mañana y en cada latido de mi corazón, mucho más de lo que cabe en una pantalla.</p>
+            <p class="firma">Con todo mi amor, tu Coquito ♥</p>
           </div>
         </div>
       </div>
@@ -3295,6 +3578,10 @@
       <path d="M54 42 Q60 48 66 42" stroke="#2a0e3e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
     </svg>
     <span class="bocadillo bocadillo-izq" id="bocadillo-manquita">¡Ey, manquita! 🎮</span>
+  </button>
+  <button class="white-asoma" id="white-asoma" type="button" aria-label="White se asoma">
+    <span class="white-cara"><img src="assets/white.webp" alt=""></span>
+    <span class="bocadillo bocadillo-white" id="bocadillo-white">¡Mamá! Un extraño está entrando a casa 😱</span>
   </button>
   <div class="logros" id="logros" aria-live="polite"></div>
 
@@ -3589,34 +3876,108 @@
     });
   });
 
-  // Librito: cada par de páginas es un pequeño capítulo sobre ella
-  const PAGINAS = [
-    ["Érase una vez una morenita andaluza...", "...que con una partida online le cambió la vida a un chico."],
-    ["Le encanta leer: se pierde en historias ajenas.", "Pero la historia que más me gusta es la que escribimos juntos."],
-    ["Escribe con el corazón,", "y cada palabra suya se me queda dentro."],
-    ["Capítulo de hoy:", "su cumpleaños. El mejor día del calendario."],
-    ["Continuará...", "toda la vida, si ella quiere. ♥"],
+  // Librito: cada capítulo ocupa dos páginas, a la izquierda el dibujo y a la derecha el texto
+  const CAPITULOS = [
+    { ico: "🎮", tit: "Érase una vez", txt: "una morenita andaluza que creaba historias preciosas… y un chico que jugaba con ella y solo le mandaba gifs y memes." },
+    { ico: "📖", tit: "La lectora", txt: "Le encanta perderse en historias ajenas. Pero la que más me gusta es la que estamos escribiendo juntos." },
+    { ico: "✍️", tit: "La escritora", txt: "Escribe con el corazón, y cada palabra suya se me queda dentro para siempre." },
+    { ico: "🦝", tit: "La mapachita", txt: "Personaje nocturno: no duerme, saca la lengua y gruñe cuando le dicen que se vaya a la cama." },
+    { ico: "👩‍🍳", tit: "La súper chef", txt: "Cocina de maravilla. Su ayudante no sabe ni hervir agua, pero promete comer muchísimo." },
+    { ico: "🏖️", tit: "Los dos", txt: "A 10 mil kilómetros, soñando con la playa, viajes, White y más gatitos, y un bucle eterno de días juntos." },
+    { ico: "🎂", tit: "Capítulo de hoy", txt: "Su cumpleaños. El mejor día del calendario, porque el mundo celebra que existe." },
+    { ico: "♾️", tit: "Continuará…", txt: "toda la vida, si ella quiere. Y yo siempre voy a querer. ♥" },
   ];
-  const libro = document.getElementById("libro");
-  const pagIzq = document.getElementById("pag-izq");
-  const pagDer = document.getElementById("pag-der");
-  const pagNum = document.getElementById("pag-num");
-  let pagina = 0;
-  function mostrarPagina() {
-    [pagIzq.textContent, pagDer.textContent] = PAGINAS[pagina];
-    pagNum.textContent = `${pagina + 1} / ${PAGINAS.length}`;
+  const libreta = document.getElementById("libreta");
+  const hojaIzq = document.getElementById("hoja-izq");
+  const hojaDer = document.getElementById("hoja-der");
+  const tapa = document.getElementById("tapa");
+  const btnAnterior = document.getElementById("pag-anterior");
+  const btnSiguiente = document.getElementById("pag-siguiente");
+  const indicador = document.getElementById("pag-indicador");
+  const letrasVuelan = document.getElementById("letras-vuelan");
+  let capitulo = 0;
+  let girando = false;
+
+  const htmlIzq = (c, i) =>
+    `<span class="dibujo">${c.ico}</span><span class="cap-titulo">${c.tit}</span><span class="num-pag">${i * 2 + 1}</span>`;
+  const htmlDer = (c, i) =>
+    `<p class="texto-pag"><span class="capitular">${c.txt[0].toUpperCase()}</span>${c.txt.slice(1)}</p><span class="num-pag">${i * 2 + 2}</span>`;
+
+  function pintar() {
+    hojaIzq.innerHTML = htmlIzq(CAPITULOS[capitulo], capitulo);
+    hojaDer.innerHTML = htmlDer(CAPITULOS[capitulo], capitulo);
+    btnAnterior.disabled = capitulo === 0;
+    btnSiguiente.disabled = capitulo === CAPITULOS.length - 1;
+    indicador.textContent = `Capítulo ${capitulo + 1} de ${CAPITULOS.length}`;
   }
-  mostrarPagina();
-  libro.addEventListener("click", () => {
-    libro.classList.remove("pasando");
-    void libro.offsetWidth;
-    libro.classList.add("pasando");
-    pagIzq.style.opacity = pagDer.style.opacity = 0;
-    setTimeout(() => {
-      pagina = (pagina + 1) % PAGINAS.length;
-      mostrarPagina();
-      pagIzq.style.opacity = pagDer.style.opacity = 1;
-    }, 400);
+
+  // Letras y corazones que salen volando del libro al pasar página
+  function soltarLetras() {
+    if (reduceMotion) return;
+    const simbolos = ["a", "m", "o", "r", "♥", "✦", "J", "L"];
+    for (let i = 0; i < 8; i++) {
+      const l = document.createElement("span");
+      l.textContent = simbolos[i];
+      l.style.left = 30 + Math.random() * 40 + "%";
+      l.style.setProperty("--dx", (Math.random() - 0.5) * 160 + "px");
+      l.style.animationDelay = i * 0.06 + "s";
+      letrasVuelan.append(l);
+      setTimeout(() => l.remove(), 2200);
+    }
+  }
+
+  // Una hoja gira sobre el lomo: delante el contenido que se va, detrás el que llega
+  function girar(direccion) {
+    if (girando) return;
+    const destino = capitulo + direccion;
+    if (destino < 0 || destino >= CAPITULOS.length) return;
+    girando = true;
+    const hoja = document.createElement("div");
+    hoja.className = `hoja-giro ${direccion > 0 ? "hacia-izq" : "hacia-der"}`;
+    if (direccion > 0) {
+      hoja.innerHTML = `<div class="cara-giro frente-giro der">${hojaDer.innerHTML}</div><div class="cara-giro dorso-giro izq">${htmlIzq(CAPITULOS[destino], destino)}</div>`;
+      hojaDer.innerHTML = htmlDer(CAPITULOS[destino], destino);
+    } else {
+      hoja.innerHTML = `<div class="cara-giro frente-giro izq">${hojaIzq.innerHTML}</div><div class="cara-giro dorso-giro der">${htmlDer(CAPITULOS[destino], destino)}</div>`;
+      hojaIzq.innerHTML = htmlIzq(CAPITULOS[destino], destino);
+    }
+    libreta.append(hoja);
+    soltarLetras();
+    const fin = () => {
+      capitulo = destino;
+      pintar();
+      hoja.remove();
+      girando = false;
+      if (capitulo === CAPITULOS.length - 1) logro("libro", "📖", "Lectora empedernida: libro terminado");
+    };
+    if (reduceMotion) return fin();
+    hoja.addEventListener("animationend", fin, { once: true });
+  }
+
+  tapa.addEventListener("click", () => {
+    libreta.classList.add("abierta");
+    tapa.setAttribute("tabindex", "-1");
+    pintar();
+    soltarLetras();
+    setTimeout(() => btnSiguiente.focus({ preventScroll: true }), 900);
+  });
+  btnSiguiente.addEventListener("click", () => girar(1));
+  btnAnterior.addEventListener("click", () => girar(-1));
+  // Tocar la página derecha avanza y la izquierda retrocede, como en un libro de verdad
+  hojaDer.addEventListener("click", () => girar(1));
+  hojaIzq.addEventListener("click", () => girar(-1));
+  // Deslizar con el dedo en el móvil
+  let inicioX = null;
+  libreta.addEventListener("pointerdown", (e) => (inicioX = e.clientX));
+  libreta.addEventListener("pointerup", (e) => {
+    if (inicioX === null || !libreta.classList.contains("abierta")) return;
+    const dx = e.clientX - inicioX;
+    if (Math.abs(dx) > 40) girar(dx < 0 ? 1 : -1);
+    inicioX = null;
+  });
+  libreta.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") girar(1);
+    if (e.key === "ArrowLeft") girar(-1);
   });
 
   // Máquina de escribir y cuaderno
@@ -3728,7 +4089,7 @@
     olla.classList.add("fuego");
     const c = centro(olla);
     lanzarParticulas(c.x, c.y, { cantidad: 30, colores: CHISPAS, potencia: 0.7, subida: true, forma: "circulo", vida: 90 });
-    if (desastre >= 3) logro("pinche", "🍳", "Pinche de cocina (casi) útil");
+    if (desastre >= 3) logro("pinche", "🍳", "Ayudante de cocina (casi) útil");
   });
   document.getElementById("btn-probar").addEventListener("click", () => {
     cocinaDice.textContent = ÑAM[Math.floor(Math.random() * ÑAM.length)];
@@ -3797,6 +4158,49 @@
     logro("manquita", "🎮", "Manquita oficial: Leo te enseñará a jugar bien");
     const c = centro(manquita);
     lanzarParticulas(c.x + 30, c.y, { cantidad: 40, colores: ["#b98cff", "#7fd16b", "#f6c667", "#5aa9e6", "#e0364f"], potencia: 0.9, vida: 150 });
+  });
+
+  // White: avisa del "extraño"… hasta que lo sobornan con galletas
+  const whiteAsoma = document.getElementById("white-asoma");
+  const bocadilloWhite = document.getElementById("bocadillo-white");
+  const FRASES_WHITE = [
+    "¡Mamá! Un extraño está entrando a casa 😱",
+    "…bueno, me está dando galletas 🍪 Puede quedarse",
+    "Mamá, el extraño huele a chuches. Lo apruebo 😼",
+  ];
+  let fraseWhite = 0;
+  function asomarWhite() {
+    bocadilloWhite.textContent = FRASES_WHITE[fraseWhite];
+    whiteAsoma.classList.add("asomada");
+    // El soborno llega a mitad de la visita
+    setTimeout(() => {
+      bocadilloWhite.textContent = FRASES_WHITE[fraseWhite === 0 ? 1 : 2];
+    }, 3200);
+    fraseWhite = (fraseWhite + 1) % 2;
+    setTimeout(() => whiteAsoma.classList.remove("asomada"), 7000);
+  }
+  setTimeout(asomarWhite, 40000);
+  setInterval(asomarWhite, 45000);
+  whiteAsoma.addEventListener("click", () => {
+    whiteAsoma.classList.add("asomada");
+    whiteAsoma.classList.remove("sobornado");
+    void whiteAsoma.offsetWidth;
+    whiteAsoma.classList.add("sobornado");
+    bocadilloWhite.textContent = "Soborno aceptado: el extraño puede quedarse para siempre 🍪❤️";
+    const c = centro(whiteAsoma);
+    for (let i = 0; i < 8; i++) {
+      const g = document.createElement("span");
+      g.className = "beso-volador";
+      g.textContent = ["🍪", "🍬", "🐟"][i % 3];
+      g.style.left = c.x + "px";
+      g.style.top = c.y + "px";
+      g.style.setProperty("--dx", -Math.random() * 220 + "px");
+      g.style.setProperty("--rot", (Math.random() - 0.5) * 90 + "deg");
+      g.style.animationDelay = i * 0.07 + "s";
+      document.body.append(g);
+      setTimeout(() => g.remove(), 2000);
+    }
+    logro("white", "🐱", "White sobornado: Leo aprobado por el gato");
   });
 
   // Logros repartidos por la página (tras cargar el script, cuando ya existen todas las piezas)
@@ -3929,6 +4333,29 @@
       const c = centro(prueba);
       lanzarParticulas(c.x, c.y, { cantidad: 20, colores: ["#ff7a93", "#f5a3b8", "#ffffff"], potencia: 0.6, vida: 100 });
     });
+  });
+
+  // Ojos camaleón: cada luz les da un color distinto
+  const ojosFoto = document.getElementById("ojos-foto");
+  const ojosMarco = document.getElementById("ojos-marco");
+  // Si aún no está la foto de sus ojos, recorta los de la foto de la portada
+  ojosFoto.addEventListener("error", () => {
+    ojosMarco.classList.add("recorte");
+    ojosFoto.src = "assets/jana.webp";
+  }, { once: true });
+  const LUCES = [
+    ["luz de día", "none"],
+    ["atardecer", "sepia(0.45) saturate(1.6) hue-rotate(-12deg) brightness(1.05)"],
+    ["luz de luna", "saturate(0.7) hue-rotate(170deg) brightness(0.95)"],
+    ["la playa", "saturate(1.4) hue-rotate(60deg)"],
+    ["la hoguera", "sepia(0.3) saturate(2) hue-rotate(-25deg)"],
+  ];
+  let luz = 0;
+  document.getElementById("btn-luz").addEventListener("click", () => {
+    luz = (luz + 1) % LUCES.length;
+    document.getElementById("nombre-luz").textContent = LUCES[luz][0];
+    ojosFoto.style.filter = LUCES[luz][1];
+    if (luz === LUCES.length - 1) logro("ojos", "👁️", "Ojos camaleón: todos los colores, todos preciosos");
   });
 
   // Cartas de Joker y Harley
