@@ -2650,6 +2650,53 @@
   .carta-caja.abierta .carta p:nth-child(7) { transition-delay: 3.4s; }
   .carta-caja.abierta .carta p:nth-child(8) { transition-delay: 3.9s; }
   .carta-caja.abierta .carta p:nth-child(9) { transition-delay: 4.6s; }
+  /* Destino, presente y futuro */
+  .tiempos {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  @media (max-width: 760px) { .tiempos { grid-template-columns: 1fr; max-width: 420px; } }
+  .tiempo {
+    position: relative;
+    margin: 0;
+    padding: 12px 12px 16px;
+    border-radius: 20px;
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+    border: 1px solid var(--line);
+    text-align: center;
+  }
+  .tiempo-etq {
+    display: block;
+    margin-bottom: 10px;
+    font-family: "Dancing Script", cursive;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--gold);
+    text-shadow: 0 0 16px rgba(246, 198, 103, 0.4);
+  }
+  .tiempo-img { overflow: hidden; border-radius: 14px; aspect-ratio: 1; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); }
+  .tiempo-img.blanco { background: #fff; }
+  .tiempo-img img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: ken 16s ease-in-out infinite alternate;
+  }
+  .tiempo-img.blanco img { object-fit: contain; }
+  .tiempo:nth-child(2) .tiempo-img img { animation-delay: -5s; }
+  .tiempo:nth-child(3) .tiempo-img img { animation-delay: -10s; }
+  .tiempo figcaption { margin-top: 12px; color: var(--muted); font-size: 0.92rem; }
+  /* Las tres tarjetas aparecen una detrás de otra */
+  .js .tiempo { opacity: 0; transform: translateY(30px) scale(0.96); transition: opacity 0.9s, transform 0.9s cubic-bezier(0.3, 1.3, 0.5, 1); }
+  .js .visible .tiempo { opacity: 1; transform: none; }
+  .js .visible .tiempo:nth-child(2) { transition-delay: 0.35s; }
+  .js .visible .tiempo:nth-child(3) { transition-delay: 0.7s; }
+  @keyframes ken { from { transform: scale(1); } to { transform: scale(1.12) translate(-2%, -2%); } }
+
   .pie-destino {
     display: block;
     margin-bottom: 8px;
@@ -3748,6 +3795,29 @@
         <p><strong>ZARAGOZA · ESPAÑA</strong>41°39′12.6″N 0°52′37.1″O</p>
       </div>
     </div>
+  </section>
+
+  <section class="seccion revelar" id="tiempos">
+    <h2>Mi destino, mi presente, mi futuro</h2>
+    <p class="intro">Mi historia empieza y termina contigo. No tengo duda de ello. ♾️</p>
+    <div class="tiempos">
+      <figure class="tiempo">
+        <span class="tiempo-etq">Eras mi destino</span>
+        <div class="tiempo-img"><img src="assets/destino.webp" alt="Ilustración de Leo y Jana besándose entre nubes al atardecer" loading="lazy"></div>
+        <figcaption>Un simple juego nos cruzó en el camino… y no fue casualidad.</figcaption>
+      </figure>
+      <figure class="tiempo">
+        <span class="tiempo-etq">Eres mi presente</span>
+        <div class="tiempo-img blanco"><img src="assets/presente.webp" alt="Ilustración de Leo abrazando a Jana con los ojos cerrados" loading="lazy"></div>
+        <figcaption>Cada risa, cada llamada y cada abrazo que nos debemos.</figcaption>
+      </figure>
+      <figure class="tiempo">
+        <span class="tiempo-etq">Serás mi futuro</span>
+        <div class="tiempo-img"><img src="assets/futuro.webp" alt="Ilustración de Jana y Leo durmiendo abrazados en una cabaña con nieve" loading="lazy"></div>
+        <figcaption>Una mantita, una vela y tú cuidando mis sueños. Para siempre.</figcaption>
+      </figure>
+    </div>
+    <p class="frase-final">Eras mi destino, eres mi presente<br><em>y serás mi futuro.</em> ❤️‍🔥🌹</p>
   </section>
 
   <section class="seccion revelar" id="carta">
