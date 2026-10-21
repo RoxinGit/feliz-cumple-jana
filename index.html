@@ -6,7 +6,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Feliz Cumpleaños Jana</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500;1,700&family=Manrope:wght@400;600;800&family=Dancing+Script:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500;1,700&family=Manrope:wght@400;600;800&family=Dancing+Script:wght@600;700&family=Press+Start+2P&display=swap">
 <style>
   /* Noche estrellada: azul noche, morado oscuro, dorado cálido, rosa y rojo pasión */
   :root {
@@ -1551,6 +1551,165 @@
   @keyframes latido-svg { 50% { transform: scale(1.3); } }
   @keyframes latido-pin { 50% { transform: translateX(-50%) scale(1.3); } }
 
+  /* Portada: apodos que cambian */
+  .intro-hero { max-width: 46ch; font-size: 1.05rem; }
+  .apodo {
+    display: inline-block;
+    font-family: "Dancing Script", cursive;
+    font-weight: 700;
+    font-size: 1.6em;
+    line-height: 1.1;
+    color: var(--gold);
+    text-shadow: 0 0 18px rgba(246, 198, 103, 0.45);
+    transition: opacity 0.35s, transform 0.35s, filter 0.35s;
+  }
+  .apodo.saliendo { opacity: 0; transform: translateY(-10px) scale(0.9); filter: blur(4px); }
+  .intro-linea { display: block; margin-top: 6px; color: var(--muted); }
+
+  /* Contador rediseñado */
+  .tiempo-juntos {
+    position: relative;
+    max-width: 600px;
+    margin: 30px auto 0;
+    padding: 18px 14px 16px;
+    border-radius: 24px;
+    background: rgba(20, 12, 45, 0.55);
+    backdrop-filter: blur(6px);
+    isolation: isolate;
+  }
+  /* Borde de luz que gira alrededor */
+  .tiempo-juntos::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: 26px;
+    background: conic-gradient(from var(--giro, 0deg), var(--gold), var(--rose), var(--ember), #b98cff, var(--gold));
+    animation: borde-giro 6s linear infinite;
+  }
+  .tiempo-juntos::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 24px;
+    background: linear-gradient(160deg, #1c1240, #120b2c);
+  }
+  @property --giro { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  @keyframes borde-giro { to { --giro: 360deg; } }
+  .tiempo-juntos .etiqueta-contador { margin: 0; }
+  .latido-ico { display: inline-block; color: var(--ember); animation: latido-svg 1s ease-in-out infinite; }
+  .tiempo-juntos .contador { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; max-width: none; }
+  .tiempo-juntos .unidad {
+    position: relative;
+    overflow: hidden;
+    padding: 12px 2px 10px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0 50%, rgba(255, 255, 255, 0.04) 50%);
+    perspective: 300px;
+  }
+  /* Línea de pliegue, estilo reloj de paletas */
+  .tiempo-juntos .unidad::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 42%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.45);
+  }
+  .tiempo-juntos .unidad strong { font-size: clamp(1.5rem, 6.5vw, 2.6rem); text-shadow: 0 0 14px rgba(246, 198, 103, 0.4); }
+  .tiempo-juntos .unidad.seg strong { color: var(--rose); }
+  .tiempo-juntos .unidad span { font-size: 0.62rem; }
+  .barra-mes {
+    height: 6px;
+    margin: 14px 4px 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+  }
+  .barra-mes span {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--gold), var(--rose), var(--ember));
+    box-shadow: 0 0 10px var(--rose);
+    transition: width 1s linear;
+  }
+  .contador-extra { margin: 10px 0 0; font-size: 0.8rem; color: var(--muted); }
+  .contador-extra strong { color: var(--gold); font-variant-numeric: tabular-nums; }
+  @keyframes paleta {
+    0% { transform: rotateX(-90deg); opacity: 0.2; }
+    60% { transform: rotateX(12deg); opacity: 1; }
+    100% { transform: rotateX(0); }
+  }
+
+  /* Botón PRESS START estilo arcade */
+  .start {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 34px;
+    padding: 16px 26px 14px;
+    border: 0;
+    border-radius: 18px;
+    color: #fff;
+    letter-spacing: 0;
+    background: linear-gradient(180deg, #ff5c75, #c4233b);
+    box-shadow: 0 6px 0 #7a1022, 0 14px 30px rgba(224, 54, 79, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.35);
+    animation: subir 0.9s ease 1.2s both, flotar 2.6s ease-in-out 2.1s infinite;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .start:active, .start.pulsado { transform: translateY(5px); box-shadow: 0 1px 0 #7a1022, 0 6px 16px rgba(224, 54, 79, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.35); }
+  .start-mando { font-size: 1.4rem; line-height: 1; animation: vibrar 0.3s linear 3s 3; }
+  .start-texto {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(0.85rem, 3.6vw, 1.05rem);
+    text-shadow: 2px 2px 0 #7a1022;
+    animation: titila 1.2s steps(2, start) 2.1s infinite;
+  }
+  .start-sub { font-family: "Press Start 2P", monospace; font-size: 0.5rem; color: #ffe0e6; opacity: 0.85; }
+  .start::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 24px;
+    border: 2px solid rgba(255, 92, 117, 0.5);
+    animation: onda 2s ease-out infinite;
+    pointer-events: none;
+  }
+  @keyframes onda { from { transform: scale(0.95); opacity: 1; } to { transform: scale(1.25); opacity: 0; } }
+  .player2 {
+    position: fixed;
+    inset: 0;
+    z-index: 85;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(1rem, 5vw, 1.8rem);
+    color: var(--gold);
+    text-align: center;
+    line-height: 1.6;
+    text-shadow: 3px 3px 0 #7a1022, 0 0 20px rgba(246, 198, 103, 0.6);
+    background: radial-gradient(circle, rgba(11, 10, 36, 0.92) 0 40%, rgba(11, 10, 36, 0.6) 70%, transparent);
+    animation: player2 1.6s ease forwards;
+  }
+  .player2 small { display: block; font-size: 0.45em; color: #fff; }
+  @keyframes player2 {
+    0% { opacity: 0; transform: scale(2); }
+    20% { opacity: 1; transform: scale(1); }
+    75% { opacity: 1; }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+  @media (max-width: 480px) {
+    .tiempo-juntos .contador { gap: 5px; }
+    .tiempo-juntos .unidad strong { font-size: 1.45rem; }
+    .tiempo-juntos .unidad span { font-size: 0.55rem; letter-spacing: 0.06em; }
+  }
+
   /* Mapachita que se asoma */
   .mapache {
     position: fixed;
@@ -1850,7 +2009,7 @@
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
   }
   .expediente::before {
-    content: "CONFIDENCIAL · CASO Nº 0424";
+    content: "CONFIDENCIAL · CASO Nº 0224";
     position: absolute;
     top: -14px;
     left: 24px;
@@ -2874,7 +3033,10 @@
   <section class="hero" id="inicio">
     <div class="niebla" aria-hidden="true"></div>
     <h1 class="titulo">Feliz Cumpleaños, <em>Mi Jana Hermosa</em> ✨</h1>
-    <p class="intro-hero">Para mi andaluza hermosa y diablilla: lo nuestro empezó jugando online.</p>
+    <p class="intro-hero">
+      Para mi <span class="apodo" id="apodo">andaluza hermosa</span>
+      <span class="intro-linea">Todo empezó con una partida online… y se convirtió en mi historia favorita. 🎮♥</span>
+    </p>
 
     <div class="pareja" id="pareja" role="button" tabindex="0" aria-label="Nosotros dos. Toca para que saltemos de alegría">
       <div class="avatar yo">
@@ -2946,15 +3108,24 @@
     </div>
     <p class="pista-pareja">Tócanos ♥</p>
 
-    <p class="etiqueta-contador">Tiempo juntos</p>
-    <div class="contador">
-      <div class="unidad"><strong id="c-meses">0</strong><span>meses</span></div>
-      <div class="unidad"><strong id="c-dias">0</strong><span>días</span></div>
-      <div class="unidad"><strong id="c-horas">0</strong><span>horas</span></div>
-      <div class="unidad"><strong id="c-minutos">0</strong><span>minutos</span></div>
+    <div class="tiempo-juntos">
+      <p class="etiqueta-contador"><span class="latido-ico" aria-hidden="true">♥</span> Tiempo juntos · desde el 24/02/2026</p>
+      <div class="contador">
+        <div class="unidad"><strong id="c-meses">0</strong><span>meses</span></div>
+        <div class="unidad"><strong id="c-dias">0</strong><span>días</span></div>
+        <div class="unidad"><strong id="c-horas">0</strong><span>horas</span></div>
+        <div class="unidad"><strong id="c-minutos">0</strong><span>min</span></div>
+        <div class="unidad seg"><strong id="c-segundos">0</strong><span>seg</span></div>
+      </div>
+      <div class="barra-mes" aria-hidden="true"><span id="barra-mes"></span></div>
+      <p class="contador-extra" id="contador-extra"></p>
     </div>
 
-    <a class="start" href="#fuego">PRESIONA START ↓</a>
+    <a class="start" href="#fuego" id="btn-start">
+      <span class="start-mando" aria-hidden="true">🎮</span>
+      <span class="start-texto">PRESS START</span>
+      <span class="start-sub">Player 2 · Jana ♥</span>
+    </a>
   </section>
 
   <section class="seccion revelar" id="fuego">
@@ -3027,10 +3198,10 @@
       <li>
         <article class="cap" role="button" tabindex="0" aria-expanded="false">
           <span class="cap-num">Capítulo 3</span>
-          <h3>Seis meses, y lo que viene</h3>
+          <h3>Desde el 24 de febrero, y lo que viene</h3>
           <span class="cap-pista">Distancia, paciencia y un futuro que ya estamos dibujando.</span>
           <div class="cap-texto"><div>
-            <p>Seis meses superando la distancia y construyendo algo que se siente real. Cada día contigo es un paso hacia el futuro que quiero compartir.</p>
+            <p><span id="meses-historia">Meses</span> superando la distancia y construyendo algo que se siente real. Cada día contigo es un paso hacia el futuro que quiero compartir.</p>
           </div></div>
         </article>
       </li>
@@ -3783,7 +3954,7 @@
 
   // Contador de tiempo juntos
   // Cambia esta fecha por la de su primer día juntos
-  const INICIO = new Date(2026, 3, 24);
+  const INICIO = new Date(2026, 1, 24);
   const MINUTO = 60000;
   const HORA = 60 * MINUTO;
   const DIA = 24 * HORA;
@@ -3804,25 +3975,79 @@
     const horas = Math.floor(resto / HORA);
     resto -= horas * HORA;
     const minutos = Math.floor(resto / MINUTO);
+    resto -= minutos * MINUTO;
+    const segundos = Math.floor(resto / 1000);
 
     ponerValor("c-meses", meses);
     ponerValor("c-dias", dias);
     ponerValor("c-horas", horas);
     ponerValor("c-minutos", minutos);
+    ponerValor("c-segundos", String(segundos).padStart(2, "0"));
+
+    // Barra: cuánto falta para el próximo mesesario (cada día 24)
+    const siguiente = new Date(INICIO);
+    siguiente.setMonth(INICIO.getMonth() + meses + 1);
+    const progreso = (ahora - ancla) / (siguiente - ancla);
+    document.getElementById("barra-mes").style.width = (progreso * 100).toFixed(2) + "%";
+    const totalDias = Math.floor((ahora - INICIO) / DIA);
+    const faltan = Math.ceil((siguiente - ahora) / DIA);
+    // Unos 70 latidos por minuto desde el primer día
+    const latidos = Math.floor(((ahora - INICIO) / MINUTO) * 70).toLocaleString("es-ES");
+    document.getElementById("contador-extra").innerHTML =
+      `<strong>${totalDias}</strong> días queriéndote · <strong>${latidos}</strong> latidos tuyos · faltan <strong>${faltan}</strong> días para el mesesario nº ${meses + 1}`;
+    const mh = document.getElementById("meses-historia");
+    if (mh) mh.textContent = `${meses} meses`;
   }
 
-  // Pulso suave cuando cambia un número del contador
+  // Cada número que cambia cae como una paleta de reloj antiguo
   function ponerValor(id, valor) {
     const el = document.getElementById(id);
     if (el.textContent === String(valor)) return;
     el.textContent = valor;
     if (!reduceMotion) {
       el.animate(
-        [{ transform: "scale(1.15)", opacity: 0.6 }, { transform: "scale(1)", opacity: 1 }],
-        { duration: 450, easing: "ease-out" }
+        [
+          { transform: "rotateX(-90deg)", opacity: 0.2 },
+          { transform: "rotateX(12deg)", opacity: 1, offset: 0.6 },
+          { transform: "rotateX(0)" },
+        ],
+        { duration: 500, easing: "ease-out" }
       );
     }
   }
+
+  // Apodos que se van turnando en la portada
+  const APODOS = ["andaluza hermosa", "mocosa diablilla morenita", "mapachita", "manquita favorita", "pechocha más hermosha", "súper chef", "Harley de mi vida"];
+  const apodo = document.getElementById("apodo");
+  let nApodo = 0;
+  if (!reduceMotion) {
+    setInterval(() => {
+      apodo.classList.add("saliendo");
+      setTimeout(() => {
+        nApodo = (nApodo + 1) % APODOS.length;
+        apodo.textContent = APODOS[nApodo];
+        apodo.classList.remove("saliendo");
+      }, 350);
+    }, 2600);
+  }
+
+  // PRESS START: "Player 2 se ha unido" y baja a la primera sección
+  document.getElementById("btn-start").addEventListener("click", (e) => {
+    e.preventDefault();
+    const btn = e.currentTarget;
+    btn.classList.add("pulsado");
+    setTimeout(() => btn.classList.remove("pulsado"), 150);
+    if (!reduceMotion) {
+      const aviso = document.createElement("div");
+      aviso.className = "player2";
+      aviso.innerHTML = "PLAYER 2<br>HAS JOINED<small>♥ Jana entra en la partida ♥</small>";
+      document.body.append(aviso);
+      setTimeout(() => aviso.remove(), 1600);
+      const c = centro(btn);
+      lanzarParticulas(c.x, c.y, { cantidad: 60, colores: ["#ff5c75", "#f6c667", "#7fd16b", "#5aa9e6", "#ffffff"], potencia: 1, vida: 160 });
+    }
+    setTimeout(() => document.getElementById("fuego").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" }), reduceMotion ? 0 : 1100);
+  });
 
   // Historia: los capítulos se abren al hacer clic o con teclado
   document.querySelectorAll(".cap").forEach((cap) => {
