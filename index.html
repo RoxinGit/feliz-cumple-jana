@@ -1886,6 +1886,64 @@
   }
   .white-asoma.asomada .bocadillo-white { opacity: 1; transform: none; }
   .white-cara.vigila img { width: 175px; left: -52px; top: -44px; }
+  /* Así te voy a cuidar */
+  .cuidar-tit { margin: 44px 0 16px; text-align: center; font-family: "Dancing Script", cursive; font-size: 1.9rem; color: var(--gold); }
+  .cuidados {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+  @media (min-width: 820px) { .cuidados { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .cuidado {
+    margin: 0;
+    padding: 8px 8px 12px;
+    border-radius: 16px;
+    background: linear-gradient(160deg, rgba(245, 163, 184, 0.18), rgba(255, 255, 255, 0.04));
+    border: 1px solid var(--line);
+    text-align: center;
+    animation: flotar 3.2s ease-in-out infinite;
+  }
+  .cuidado:nth-child(2n) { animation-delay: -1.6s; }
+  .cuidado[hidden] { display: none; }
+  .cuidado img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+  .cuidado figcaption { margin-top: 8px; font-size: 0.82rem; line-height: 1.3; color: var(--ink); }
+  .js .cuidado { opacity: 0; transform: scale(0.9); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.3, 1.4, 0.5, 1); }
+  .js .visible .cuidado { opacity: 1; transform: none; }
+  .js .visible .cuidado:nth-child(2) { transition-delay: 0.15s; }
+  .js .visible .cuidado:nth-child(3) { transition-delay: 0.3s; }
+  .js .visible .cuidado:nth-child(4) { transition-delay: 0.45s; }
+  .js .visible .cuidado:nth-child(5) { transition-delay: 0.6s; }
+
+  /* Tarjetita de promesa que sube desde abajo, en el centro */
+  .promesa {
+    position: fixed;
+    left: 50%;
+    bottom: -140px;
+    z-index: 41;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: min(300px, calc(100% - 140px));
+    padding: 8px 12px 8px 8px;
+    border: 1px solid var(--rose);
+    border-radius: 18px;
+    background: linear-gradient(160deg, #3b1657, #1a1140);
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 163, 184, 0.3);
+    transform: translateX(-50%) rotate(-2deg);
+    transition: bottom 0.8s cubic-bezier(0.3, 1.5, 0.5, 1);
+  }
+  .promesa.asomada { bottom: 16px; }
+  .promesa img { width: 58px; height: 58px; flex: none; object-fit: cover; border-radius: 12px; }
+  .promesa small { display: block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rose); }
+  .promesa strong { display: block; font-size: 0.85rem; line-height: 1.25; }
+  @media (max-width: 480px) { .promesa { width: calc(100% - 170px); min-width: 180px; } .promesa img { width: 46px; height: 46px; } .promesa strong { font-size: 0.75rem; } }
+
   /* Leo se asoma por el borde izquierdo */
   .leo-asoma {
     position: fixed;
@@ -3593,6 +3651,15 @@
     </div>
     <p class="estado-vales" id="estado-mimos" aria-live="polite">Mimos dados: 0 (y los que faltan)</p>
 
+    <h3 class="cuidar-tit">Así te voy a cuidar 💕</h3>
+    <div class="cuidados">
+      <figure class="cuidado"><img src="assets/cuidar-unas.webp" alt="Él pintándole las uñas a ella" loading="lazy"><figcaption>Pintarte las uñas (aunque me salga un poco chueco 💅)</figcaption></figure>
+      <figure class="cuidado"><img src="assets/cuidar-dientes.png" alt="Él cepillándole los dientes a ella" loading="lazy"><figcaption>Lavarte los dientes cuando estés muerta de sueño 🪥😴</figcaption></figure>
+      <figure class="cuidado"><img src="assets/cuidar-pelo.webp" alt="Ilustración de él secándole el pelo a ella" loading="lazy"><figcaption>Secarte ese pelito precioso 💨</figcaption></figure>
+      <figure class="cuidado"><img src="assets/cuidar-te.webp" alt="Ilustración de él dándole una taza caliente a ella envuelta en una manta" loading="lazy"><figcaption>Mantita, tecito y mimos cuando estés malita ☕🤒</figcaption></figure>
+      <figure class="cuidado" hidden><img src="assets/cuidar-nalguitas.webp" alt="Él mordiéndole el culito a ella" loading="lazy" onload="this.parentElement.hidden=false"><figcaption>Y aprovechar para morderte las nalguitas cada vez que te vea 🍑😈</figcaption></figure>
+      <figure class="cuidado" hidden><img src="assets/cuidar-beshitos.webp" alt="Ilustración de él dándole besitos en la mejilla a ella" loading="lazy" onload="this.parentElement.hidden=false"><figcaption>Y llenarte de esos beshitos que tanto te encantan 😘</figcaption></figure>
+    </div>
     <div class="polaroids">
       <figure class="polaroid"><img src="assets/mimo-cama.webp" alt="Panda y osito abrazados en la cama" loading="lazy"><figcaption>Así quiero dormir contigo</figcaption></figure>
       <figure class="polaroid"><img src="assets/mimo-patita.png" alt="Una patita con almohadillas rosas" loading="lazy"><figcaption>Esos piecitos ♥</figcaption></figure>
@@ -4169,6 +4236,10 @@
   <button class="white-asoma" id="white-asoma" type="button" aria-label="White se asoma">
     <span class="white-cara"><img src="assets/white.webp" alt=""></span>
     <span class="bocadillo bocadillo-white" id="bocadillo-white">¡Mamá! Un extraño está entrando a casa 😱</span>
+  </button>
+  <button class="promesa" id="promesa" type="button" aria-label="Una promesa de cuidado">
+    <img id="promesa-img" src="assets/cuidar-unas.webp" alt="">
+    <span class="promesa-txt"><small>Promesa de Coquito</small><strong id="promesa-frase">Pintarte las uñas 💅</strong></span>
   </button>
   <div class="logros" id="logros" aria-live="polite"></div>
 
@@ -4858,6 +4929,45 @@
     }
     logro("coquito", "😘", "Coquito pillado: beshito sorpresa");
     setTimeout(() => leoAsoma.classList.remove("asomada"), 4500);
+  });
+
+  // Promesas de cuidado: tarjetitas que suben desde abajo de vez en cuando
+  const promesa = document.getElementById("promesa");
+  const promesaImg = document.getElementById("promesa-img");
+  const promesaFrase = document.getElementById("promesa-frase");
+  const PROMESAS = [
+    ["cuidar-unas.webp", "Pintarte las uñas (aunque me salga chueco) 💅"],
+    ["cuidar-dientes.png", "Lavarte los dientes cuando te caigas de sueño 🪥😴"],
+    ["cuidar-pelo.webp", "Secarte el pelito después de la ducha 💨"],
+    ["cuidar-te.webp", "Tecito y mantita cuando estés malita ☕"],
+    ["cuidar-nalguitas.webp", "Morderte las nalguitas cada vez que te vea 🍑😈"],
+    ["cuidar-beshitos.webp", "Llenarte de esos beshitos que tanto te encantan 😘"],
+  ];
+  // Las dos últimas solo entran si su foto ya está en la carpeta
+  for (const nombre of ["cuidar-nalguitas.webp", "cuidar-beshitos.webp"]) {
+    const prueba = new Image();
+    prueba.onerror = () => {
+      const i = PROMESAS.findIndex(([img]) => img === nombre);
+      if (i >= 0) PROMESAS.splice(i, 1);
+    };
+    prueba.src = "assets/" + nombre;
+  }
+  let nPromesa = 0;
+  function asomarPromesa() {
+    const [img, frase] = PROMESAS[nPromesa++ % PROMESAS.length];
+    promesaImg.src = "assets/" + img;
+    promesaFrase.textContent = frase;
+    promesa.classList.add("asomada");
+    setTimeout(() => promesa.classList.remove("asomada"), 5500);
+  }
+  setTimeout(asomarPromesa, 27000);
+  setInterval(asomarPromesa, 41000);
+  promesa.addEventListener("click", () => {
+    const c = centro(promesa);
+    lanzarParticulas(c.x, c.y, { cantidad: 40, colores: ["#f5a3b8", "#e0364f", "#ffffff"], potencia: 0.8, subida: true, forma: "circulo", vida: 120 });
+    promesaFrase.textContent = "Promesa firmada ✍️❤️ ¡Y la cumpliré!";
+    logro("promesa", "🤞", "Promesas de cuidado aceptadas");
+    setTimeout(() => promesa.classList.remove("asomada"), 2500);
   });
 
   // White: avisa del "extraño"… hasta que lo sobornan con galletas
