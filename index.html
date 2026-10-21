@@ -51,7 +51,7 @@
     pointer-events: none;
   }
   #estrellas { z-index: 0; }
-  #confeti { z-index: 50; }
+  #confeti { z-index: 96; }
 
   main {
     position: relative;
@@ -2705,6 +2705,109 @@
 
   .playlist-nombre { font-family: "Dancing Script", cursive; font-style: normal; font-weight: 700; font-size: 1.3em; color: var(--gold); }
 
+  /* Pantalla de regalo de entrada */
+  .con-regalo, .con-regalo body { overflow: hidden; }
+  .regalo {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background:
+      radial-gradient(circle at 50% 45%, rgba(224, 54, 79, 0.28), transparent 55%),
+      radial-gradient(circle at 50% 100%, rgba(120, 70, 200, 0.35), transparent 60%),
+      #0b0a24;
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .regalo.fuera { opacity: 0; transform: scale(1.15); pointer-events: none; }
+  .regalo-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+  .regalo-caja { position: relative; width: 150px; height: 140px; animation: regalo-salta 1.6s ease-in-out infinite; }
+  .regalo-cuerpo {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 0;
+    height: 96px;
+    border-radius: 8px;
+    background:
+      linear-gradient(90deg, transparent 43%, var(--gold) 43% 57%, transparent 57%),
+      linear-gradient(160deg, #ff5c75, #b3203a);
+    box-shadow: 0 20px 40px rgba(224, 54, 79, 0.45);
+  }
+  .regalo-tapa {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 22px;
+    height: 30px;
+    z-index: 1;
+    border-radius: 8px;
+    background:
+      linear-gradient(90deg, transparent 43%, #ffd98a 43% 57%, transparent 57%),
+      linear-gradient(160deg, #ff7a8e, #c4233b);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.8s cubic-bezier(0.3, 1.4, 0.5, 1);
+  }
+  .regalo-lazo {
+    position: absolute;
+    left: 50%;
+    top: -26px;
+    width: 64px;
+    height: 32px;
+    margin-left: -32px;
+  }
+  .regalo-lazo::before, .regalo-lazo::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 28px;
+    border: 7px solid var(--gold);
+    border-radius: 50% 50% 0 50%;
+  }
+  .regalo-lazo::before { left: 0; transform: rotate(-20deg); }
+  .regalo-lazo::after { right: 0; transform: rotate(20deg) scaleX(-1); }
+  .regalo.abierto .regalo-tapa { transform: translateY(-160px) rotate(-35deg); }
+  .regalo.abierto .regalo-caja { animation: none; }
+  .regalo-texto {
+    font-family: "Dancing Script", cursive;
+    font-weight: 700;
+    font-size: clamp(2rem, 9vw, 3rem);
+    line-height: 1.1;
+    background: linear-gradient(90deg, var(--gold), var(--rose), var(--ember));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .regalo-pista { font-weight: 800; letter-spacing: 0.12em; font-size: 0.8rem; color: var(--muted); animation: titila 1.4s steps(2, start) infinite; }
+  @keyframes regalo-salta {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    20% { transform: translateY(-14px) rotate(-4deg); }
+    40% { transform: translateY(0) rotate(3deg); }
+    55% { transform: translateY(-6px) rotate(-2deg); }
+  }
+
+  /* Brillo dorado que recorre los títulos al aparecer */
+  .seccion h2 {
+    background-image: linear-gradient(100deg, #fff 0%, var(--gold) 35%, #fffbe8 50%, var(--gold) 65%, var(--rose) 100%);
+    background-size: 250% 100%;
+    background-position: 100% 0;
+  }
+  .js .visible h2 { animation: brillo-titulo 2.4s ease 0.3s both; }
+  @keyframes brillo-titulo { from { background-position: 100% 0; } to { background-position: 0 0; } }
+
   .pie-destino {
     display: block;
     margin-bottom: 8px;
@@ -4573,7 +4676,8 @@
   document.getElementById("btn-cinco").addEventListener("click", () => cincoMinutos >= 4 && logro("cinco", "⏰", "Maestra del «5 minutitos más»"));
   mapache.addEventListener("click", () => logro("mapache", "🦝", "Mapachita descubierta"));
   });
-  setTimeout(() => logro("bienvenida", "🎉", "Nivel 1 desbloqueado: un año más de Jana"), 2500);
+  // La bienvenida sale al abrir el regalo (o a los pocos segundos si no hay regalo)
+  const darBienvenida = () => logro("bienvenida", "🎉", "Nivel 1 desbloqueado: un año más de Jana");
 
   // Mapachita: se asoma de vez en cuando por la esquina
   const mapache = document.getElementById("mapache");
@@ -4754,6 +4858,44 @@
       lanzarParticulas(c.x, c.y, { cantidad: 30, colores: ["#ffffff", "#9fd8ff", "#f6c667"], potencia: 0.6, subida: true, forma: "circulo", vida: 110 });
     });
   });
+
+  // Fuegos artificiales: varias explosiones en puntos al azar de la pantalla
+  function fuegosArtificiales(rondas = 6) {
+    if (reduceMotion) return;
+    const colores = [["#f6c667", "#fff3b0"], ["#f5a3b8", "#ffffff"], ["#e0364f", "#ff9aa8"], ["#b98cff", "#e3d4ff"], ["#7fd16b", "#d8ffcc"]];
+    for (let i = 0; i < rondas; i++) {
+      setTimeout(() => {
+        const x = window.innerWidth * (0.15 + Math.random() * 0.7);
+        const y = window.innerHeight * (0.15 + Math.random() * 0.4);
+        lanzarParticulas(x, y, { cantidad: 70, colores: colores[i % colores.length], potencia: 1.1, forma: "circulo", vida: 110 });
+      }, i * 280);
+    }
+  }
+
+  // Pantalla de regalo: se abre al tocarla y descubre la página
+  const regalo = document.createElement("div");
+  regalo.className = "regalo";
+  regalo.innerHTML = `
+    <button class="regalo-btn" type="button" aria-label="Abrir tu regalo">
+      <span class="regalo-caja" aria-hidden="true">
+        <span class="regalo-tapa"><span class="regalo-lazo"></span></span>
+        <span class="regalo-cuerpo"></span>
+      </span>
+      <span class="regalo-texto">Tienes un regalo, Jana</span>
+      <span class="regalo-pista">Toca para abrirlo ♥</span>
+    </button>`;
+  document.body.append(regalo);
+  document.documentElement.classList.add("con-regalo");
+  regalo.querySelector(".regalo-btn").addEventListener("click", () => {
+    regalo.classList.add("abierto");
+    fuegosArtificiales(8);
+    setTimeout(darBienvenida, 1300);
+    setTimeout(() => {
+      regalo.classList.add("fuera");
+      document.documentElement.classList.remove("con-regalo");
+    }, 900);
+    setTimeout(() => regalo.remove(), 1800);
+  }, { once: true });
 
   // Pareja animada: salto y lluvia de corazones
   const pareja = document.getElementById("pareja");
