@@ -1956,8 +1956,40 @@
     transition: filter 1.2s ease;
   }
   .ojos-marco.recorte img { object-position: 50% 8%; }
-  /* Foto propia de los ojos: acerca la zona de los ojos y deja fuera la tela de arriba */
-  .ojos-marco:not(.recorte) img { transform: scale(1.6); transform-origin: 30% 80%; }
+  .ojos-marco.recorte .iris { display: none; }
+  /* Foto y círculos de color se acercan juntos, para que cada círculo siga encima de su iris */
+  .ojos-lienzo { position: absolute; inset: 0; }
+  .ojos-marco:not(.recorte) .ojos-lienzo { transform: scale(1.6); transform-origin: 30% 80%; }
+  .iris {
+    position: absolute;
+    width: 6.6%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0.3);
+    background: radial-gradient(circle, transparent 0 22%, var(--iris, transparent) 30% 66%, transparent 72%);
+    mix-blend-mode: color;
+    opacity: 0;
+    transition: opacity 0.5s, transform 0.5s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.5s;
+  }
+  .iris-izq { left: 21.8%; top: 67%; }
+  .iris-der { left: 47.8%; top: 72.5%; width: 7%; }
+  .ojos-marco.pintado .iris { opacity: 0.75; transform: translate(-50%, -50%) scale(0.85); }
+  .color-ojos {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 2;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 800;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .ojos-marco.pintado .color-ojos { opacity: 1; }
+  .ojos-marco.destello { animation: bleh 0.4s ease; }
   /* Destello que recorre los ojos como un cambio de luz */
   .ojos-marco::after {
     content: "";
@@ -3094,10 +3126,15 @@
       <div class="ojos-camaleon">
         <p class="prueba-num">Prueba especial · los ojos camaleón</p>
         <div class="ojos-marco" id="ojos-marco">
-          <img id="ojos-foto" src="assets/ojos.webp" alt="Los ojos de Jana" loading="lazy">
+          <div class="ojos-lienzo">
+            <img id="ojos-foto" src="assets/ojos.webp" alt="Los ojos de Jana" loading="lazy">
+            <span class="iris iris-izq" aria-hidden="true"></span>
+            <span class="iris iris-der" aria-hidden="true"></span>
+          </div>
+          <span class="color-ojos" id="color-ojos" aria-hidden="true"></span>
         </div>
         <p class="prueba-pie">La sospechosa declara que sus ojos cambian de color con la luz. El detective lo ha comprobado: es verdad, y todos son preciosos.</p>
-        <button class="btn-mimo btn-luz" id="btn-luz" type="button">💡 Cambiar la luz: <span id="nombre-luz">luz de día</span></button>
+        <button class="btn-mimo btn-luz" id="btn-luz" type="button">🎨 Cambiar el color de sus ojos: <span id="nombre-luz">café original</span></button>
       </div>
     </div>
   </section>
@@ -4335,7 +4372,7 @@
     });
   });
 
-  // Ojos camaleón: cada luz les da un color distinto
+  // Ojos camaleón: solo el iris cambia de color, la foto queda igual
   const ojosFoto = document.getElementById("ojos-foto");
   const ojosMarco = document.getElementById("ojos-marco");
   // Si aún no está la foto de sus ojos, recorta los de la foto de la portada
@@ -4343,19 +4380,31 @@
     ojosMarco.classList.add("recorte");
     ojosFoto.src = "assets/jana.webp";
   }, { once: true });
-  const LUCES = [
-    ["luz de día", "none"],
-    ["atardecer", "sepia(0.45) saturate(1.6) hue-rotate(-12deg) brightness(1.05)"],
-    ["luz de luna", "saturate(0.7) hue-rotate(170deg) brightness(0.95)"],
-    ["la playa", "saturate(1.4) hue-rotate(60deg)"],
-    ["la hoguera", "sepia(0.3) saturate(2) hue-rotate(-25deg)"],
+  const COLORES_OJOS = [
+    ["café original", null, "☕ Café: el de siempre, el más bonito"],
+    ["miel", "#e0a030", "🍯 Miel: con el sol de la tarde"],
+    ["verde", "#3fae5a", "🌿 Verde: modo camaleón activado"],
+    ["azul mar", "#2f8fe0", "🌊 Azul mar: como la playa"],
+    ["gris tormenta", "#8fa3b5", "⛈️ Gris: cuando se enfada (un poquito)"],
+    ["violeta", "#a35be0", "💜 Violeta: modo diablilla"],
+    ["rojo diablilla", "#e0364f", "😈 Rojo: ¡Leo, vete a dormir tú!"],
   ];
-  let luz = 0;
+  let colorOjos = 0;
   document.getElementById("btn-luz").addEventListener("click", () => {
-    luz = (luz + 1) % LUCES.length;
-    document.getElementById("nombre-luz").textContent = LUCES[luz][0];
-    ojosFoto.style.filter = LUCES[luz][1];
-    if (luz === LUCES.length - 1) logro("ojos", "👁️", "Ojos camaleón: todos los colores, todos preciosos");
+    colorOjos = (colorOjos + 1) % COLORES_OJOS.length;
+    const [nombre, color, etiqueta] = COLORES_OJOS[colorOjos];
+    document.getElementById("nombre-luz").textContent = nombre;
+    document.getElementById("color-ojos").textContent = etiqueta;
+    ojosMarco.style.setProperty("--iris", color || "transparent");
+    ojosMarco.classList.toggle("pintado", Boolean(color));
+    ojosMarco.classList.remove("destello");
+    void ojosMarco.offsetWidth;
+    ojosMarco.classList.add("destello");
+    if (color) {
+      const c = centro(ojosMarco);
+      lanzarParticulas(c.x, c.y, { cantidad: 18, colores: [color, "#ffffff"], potencia: 0.5, forma: "circulo", vida: 80 });
+    }
+    if (colorOjos === COLORES_OJOS.length - 1) logro("ojos", "👁️", "Ojos camaleón: todos los colores, todos preciosos");
   });
 
   // Cartas de Joker y Harley
