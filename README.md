@@ -14,7 +14,7 @@ feliz-cumple-jana/
 ## Cosas que puedes cambiar
 
 - **Fecha de inicio del contador**: en `index.html`, busca `const INICIO = new Date(2026, 3, 21);` y pon la fecha de su primer día juntos (año, mes con 0 = enero, día).
-- **Canciones**: busca `const CANCIONES` en `index.html`. El reproductor es visual: la barra avanza, pero no reproduce audio real.
+- **Canciones de Spotify**: en `index.html`, dentro de la sección `#musica`, hay un bloque `<div class="spotify">` por canción. Para añadir una, copia ese bloque y cambia el ID de la URL `embed/track/...` por el de la canción (la parte del enlace después de `/track/`, sin `?si=...`).
 - **Textos de capítulos, vales y carta**: están escritos directamente en el HTML.
 
 ## Probarla en local
