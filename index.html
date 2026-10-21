@@ -2623,6 +2623,69 @@
     .bocadillo-izq { right: auto; left: 60px; bottom: 54px; }
   }
 
+  /* Pareja romántica: de la mano, cabezas que se buscan y un besito cada pocos segundos */
+  .avatar.ella { animation-delay: 0s; }
+  .pareja.salto .ella { animation-delay: 0s; }
+  .yo .cabeza { animation: inclinar-yo 6s ease-in-out infinite; }
+  .ella .cabeza { animation: inclinar-ella 6s ease-in-out infinite; }
+  .cuernitos { transform-origin: 50% 473%; animation: inclinar-ella 6s ease-in-out infinite; }
+  @keyframes inclinar-yo {
+    0%, 100% { transform: rotate(5deg); }
+    40% { transform: rotate(9deg); }
+    70% { transform: rotate(6deg); }
+    80%, 90% { transform: translateX(16px) rotate(15deg); }
+  }
+  @keyframes inclinar-ella {
+    0%, 100% { transform: rotate(-5deg); }
+    40% { transform: rotate(-9deg); }
+    70% { transform: rotate(-6deg); }
+    80%, 90% { transform: translateX(-16px) rotate(-15deg); }
+  }
+  .halo-pareja {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    z-index: -1;
+    width: 340px;
+    height: 300px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(245, 163, 184, 0.35), rgba(224, 54, 79, 0.12) 60%, transparent);
+    animation: halo 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes halo { 50% { transform: translate(-50%, -50%) scale(1.12); opacity: 0.7; } }
+  .corazon-manos {
+    position: absolute;
+    left: 50%;
+    bottom: 30px;
+    z-index: 5;
+    font-size: 1.4rem;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 8px rgba(255, 80, 110, 0.9));
+    animation: latido-manos 1.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes latido-manos { 50% { transform: translateX(-50%) scale(1.3); } }
+  .beso-pop {
+    position: absolute;
+    left: 50%;
+    top: 40px;
+    z-index: 6;
+    font-size: 1.8rem;
+    opacity: 0;
+    pointer-events: none;
+    animation: beso-pop 6s ease-in-out infinite;
+  }
+  @keyframes beso-pop {
+    0%, 78% { opacity: 0; transform: translate(-50%, 10px) scale(0.2); }
+    83% { opacity: 1; transform: translate(-50%, -6px) scale(1.4); }
+    88% { opacity: 1; transform: translate(-50%, -10px) scale(1); }
+    96%, 100% { opacity: 0; transform: translate(-50%, -40px) scale(0.8); }
+  }
+  /* Con la cabeza tan cerca, los corazones salen más rápido y más altos */
+  .corazones span { animation-duration: 2.4s; }
+
   /* Barra de progreso de lectura */
   .progreso {
     position: fixed;
@@ -3279,12 +3342,15 @@
           <path d="M28 160 L34 64 Q70 44 106 64 L112 160 Z" fill="#1a1a22"/>
           <path d="M28 160 L32 62 Q46 52 58 52 L62 160 Z M112 160 L108 62 Q94 52 82 52 L78 160 Z" fill="#8f8fd6"/>
           <path d="M40 60 V160 M50 54 V160 M90 54 V160 M100 60 V160 M30 90 H62 M78 90 H110 M30 120 H62 M78 120 H110" stroke="#c3638a" stroke-width="2" opacity="0.6"/>
-          <path d="M108 66 Q130 90 120 128" stroke="#8f8fd6" stroke-width="16" fill="none" stroke-linecap="round"/>
-          <circle cx="120" cy="130" r="9" fill="#e9b895"/>
-          <g class="brazo-saluda"><path d="M32 70 Q8 50 12 20" stroke="#8f8fd6" stroke-width="16" fill="none" stroke-linecap="round"/><circle cx="12" cy="14" r="9" fill="#e9b895"/></g>
+          <path d="M108 66 Q136 96 150 112" stroke="#8f8fd6" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <circle cx="152" cy="114" r="9" fill="#e9b895"/>
+          <path d="M32 70 Q14 100 22 130" stroke="#8f8fd6" stroke-width="16" fill="none" stroke-linecap="round"/><circle cx="22" cy="134" r="9" fill="#e9b895"/>
         </svg>
       </div>
       <div class="corazones" aria-hidden="true"><span>♥</span><span>♥</span><span>♥</span></div>
+      <span class="halo-pareja" aria-hidden="true"></span>
+      <span class="corazon-manos" aria-hidden="true">❤️</span>
+      <span class="beso-pop" aria-hidden="true">💋</span>
       <div class="avatar ella">
         <svg class="cuernitos" viewBox="0 0 110 30" aria-hidden="true">
           <path d="M18 30 Q14 10 4 2 Q26 8 30 28 Z M92 30 Q96 10 106 2 Q84 8 80 28 Z" fill="#e0364f"/>
@@ -3306,9 +3372,9 @@
           <path d="M40 62 Q70 50 100 62 L126 160 H14 Z" fill="#e0364f"/>
           <path d="M14 160 Q70 140 126 160" fill="#f5a3b8"/>
           <circle cx="50" cy="110" r="4" fill="#fff" opacity="0.7"/><circle cx="86" cy="96" r="4" fill="#fff" opacity="0.7"/><circle cx="72" cy="132" r="4" fill="#fff" opacity="0.7"/>
-          <path d="M42 68 Q18 92 22 128" stroke="#e0364f" stroke-width="14" fill="none" stroke-linecap="round"/>
-          <circle cx="22" cy="130" r="8" fill="#f2c9a6"/>
-          <g class="brazo-saluda"><path d="M100 68 Q126 50 124 20" stroke="#e0364f" stroke-width="14" fill="none" stroke-linecap="round"/><circle cx="124" cy="14" r="8" fill="#f2c9a6"/></g>
+          <path d="M42 68 Q10 96 -6 112" stroke="#e0364f" stroke-width="14" fill="none" stroke-linecap="round"/>
+          <circle cx="-8" cy="114" r="8" fill="#f2c9a6"/>
+          <path d="M100 68 Q124 100 116 130" stroke="#e0364f" stroke-width="14" fill="none" stroke-linecap="round"/><circle cx="116" cy="134" r="8" fill="#f2c9a6"/>
         </svg>
       </div>
       <svg class="gatito g1" viewBox="0 0 70 64" aria-hidden="true">
