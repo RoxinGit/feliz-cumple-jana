@@ -2380,6 +2380,23 @@
   .curriculum figcaption { display: grid; gap: 2px; font-size: 0.85rem; }
   .curriculum strong { font-family: var(--font-display); font-size: 1.2rem; color: var(--ember); }
   .cocina-dice { max-width: 560px; margin: 18px auto 0; }
+  .inspector {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 560px;
+    margin: 16px auto 0;
+    padding: 10px;
+    border-radius: 14px;
+    background: #fffaf0;
+    color: #3a2410;
+    transform: rotate(1.5deg);
+    animation: balanceo 5s ease-in-out infinite;
+  }
+  .inspector[hidden] { display: none; }
+  .inspector img { width: 92px; height: 110px; object-fit: cover; object-position: 50% 35%; border-radius: 8px; flex: none; }
+  .inspector figcaption { display: grid; gap: 4px; font-size: 0.88rem; }
+  .inspector strong { font-family: var(--font-display); font-size: 1.2rem; color: #2f6fb3; }
   @keyframes remover { from { transform: rotate(-8deg); } to { transform: rotate(10deg); } }
   @keyframes vapor {
     0% { opacity: 0; transform: translateY(0) scale(0.6); }
@@ -3673,6 +3690,13 @@
         </figcaption>
       </figure>
     </div>
+    <figure class="inspector" hidden>
+      <img src="assets/white-3.webp" alt="White de perfil con mirada seria" loading="lazy" onload="this.parentElement.hidden=false">
+      <figcaption>
+        <strong>White, inspector de cocina 🧐</strong>
+        <span>«Comida de la chef: aprobada. Ayudante: en periodo de prueba. Falta pescado 🐟»</span>
+      </figcaption>
+    </figure>
     <p class="burbuja yo-dice cocina-dice" id="cocina-dice">¿En qué te ayudo, chef? 👨‍🍳</p>
     <div class="mimos-botones">
       <button class="btn-mimo" id="btn-ayudar" type="button">🥄 Dejar que Leo ayude</button>
