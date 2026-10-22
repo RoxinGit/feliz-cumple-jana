@@ -1375,6 +1375,7 @@
   .btn-pag:active:not(:disabled) { transform: scale(0.9); }
   .btn-pag:disabled { opacity: 0.3; cursor: default; }
   .pag-indicador { min-width: 9em; text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; color: var(--muted); }
+  .btn-enviar { margin-top: 12px; background: linear-gradient(90deg, var(--gold), var(--rose)); color: #2a0b12; border: 0; }
   .pluma { display: inline-block; transform-origin: 20% 90%; animation: escribir 0.9s ease-in-out infinite alternate; }
   @keyframes escribir { from { transform: rotate(-12deg) translateX(-2px); } to { transform: rotate(8deg) translateX(3px); } }
   .frase-atardecer {
@@ -3962,7 +3963,8 @@
       <p class="maquina-tit">Ahora te toca a ti <span class="pluma" aria-hidden="true">✒️</span></p>
       <p class="tecleado" id="tecleado" aria-live="polite"></p>
       <textarea id="cuaderno" rows="4" placeholder="Escríbele algo a tu Coquito..." aria-label="Tu nota"></textarea>
-      <p class="pista-pareja">Se guarda en este dispositivo para que la sigas cuando quieras.</p>
+      <button class="btn-mimo btn-enviar" id="btn-enviar" type="button">💌 Enviárselo a mi Coquito</button>
+      <p class="pista-pareja" id="pista-cuaderno">Se guarda aquí mientras escribes. Cuando termines, pulsa el botón y me llega por WhatsApp.</p>
     </div>
   </section>
 
@@ -4832,6 +4834,28 @@
   try {
     cuaderno.value = localStorage.getItem("nota-jana") || "";
   } catch {}
+  // Enviar la nota: menú de compartir del móvil si existe, si no WhatsApp con el texto ya escrito
+  document.getElementById("btn-enviar").addEventListener("click", async () => {
+    const nota = cuaderno.value.trim();
+    const pista = document.getElementById("pista-cuaderno");
+    if (!nota) {
+      pista.textContent = "Escribe algo primero, mocosa 😏✍️";
+      cuaderno.focus();
+      return;
+    }
+    const texto = `💌 Para mi Coquito:\n\n${nota}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ text: texto });
+      } else {
+        window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank", "noopener");
+      }
+      pista.textContent = "¡Enviado! Tu Coquito ya lo está leyendo ❤️";
+      logro("nota", "💌", "Escritora oficial: nota enviada a Coquito");
+    } catch {
+      pista.textContent = "No se envió. Vuelve a intentarlo cuando quieras ♥";
+    }
+  });
   cuaderno.addEventListener("input", () => {
     try {
       localStorage.setItem("nota-jana", cuaderno.value);
