@@ -3148,6 +3148,7 @@
     color: #fff;
   }
   .juego-marcador[hidden] { display: none; }
+  .juego-marcador { white-space: nowrap; font-size: 0.6rem; }
   .cae {
     position: absolute;
     top: -60px;
@@ -3159,6 +3160,51 @@
     cursor: pointer;
     animation: cae linear forwards;
   }
+  .memoria {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    width: min(360px, 100%);
+  }
+  @media (min-width: 600px) { .memoria { grid-template-columns: repeat(4, minmax(0, 1fr)); width: min(460px, 100%); } }
+  .memoria[hidden] { display: none; }
+  .memo-carta {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    perspective: 600px;
+  }
+  .memo-dorso, .memo-cara {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 4px;
+    border-radius: 12px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: transform 0.5s ease;
+  }
+  .memo-dorso {
+    background: repeating-linear-gradient(45deg, #3b1657 0 10px, #4a1d6e 10px 20px);
+    border: 2px solid var(--gold);
+    color: var(--gold);
+    font-size: 1.6rem;
+  }
+  .memo-cara {
+    transform: rotateY(180deg);
+    background: #fffaf0;
+    border: 2px solid var(--rose);
+    font-size: 2rem;
+  }
+  .memo-cara small { font-size: 0.6rem; font-weight: 800; color: #6b2a3d; }
+  .memo-carta.vuelta .memo-dorso { transform: rotateY(180deg); }
+  .memo-carta.vuelta .memo-cara { transform: rotateY(360deg); }
+  .memo-carta.hecha .memo-cara { box-shadow: 0 0 16px var(--gold); border-color: var(--gold); }
   .coquito-huye {
     position: absolute;
     z-index: 2;
@@ -5550,9 +5596,89 @@
     }, 900);
     setTimeout(() => regalo.remove(), 1800);
     // A partir de la segunda visita, después del regalo llega el minijuego
-    // Se turnan los dos minijuegos: visitas pares, besitos; impares, atrapar a Coquito
-    if (visita >= 2) setTimeout(visita % 2 === 0 ? abrirMinijuego : atraparCoquito, 2400);
+    // Los minijuegos se turnan, uno distinto en cada visita a partir de la segunda
+    const MINIJUEGOS = [abrirMinijuego, atraparCoquito, memoriaNosotros];
+    if (visita >= 2) setTimeout(MINIJUEGOS[(visita - 2) % MINIJUEGOS.length], 2400);
   }, { once: true });
+
+  // Minijuego "Memoria de nosotros": encontrar las 6 parejas
+  function memoriaNosotros() {
+    const PAREJAS = [["🦝", "La mapachita"], ["🐱", "White"], ["🎮", "La partida"], ["🍣", "Sushi"], ["🏖️", "La playa"], ["🃏", "Joker y Harley"]];
+    const cartas = [...PAREJAS, ...PAREJAS].map(([e, n], i) => ({ e, n, i })).sort(() => Math.random() - 0.5);
+    const juego = document.createElement("div");
+    juego.className = "juego";
+    juego.innerHTML = `
+      <div class="juego-panel">
+        <p class="juego-tit">🎮 Minijuego del día</p>
+        <h3>Memoria de nosotros</h3>
+        <p>Encuentra las 6 parejas de nuestras cositas.<br>Cuantos menos intentos, mejor premio 😏</p>
+        <div class="juego-botones">
+          <button class="btn-mimo juego-empezar" type="button">¡Jugar!</button>
+          <button class="btn-mimo juego-saltar" type="button">Ahora no</button>
+        </div>
+      </div>
+      <div class="juego-marcador" hidden><span id="memo-parejas">0</span>/6 · <span id="memo-intentos">0</span> intentos</div>
+      <div class="memoria" hidden>${cartas
+        .map((c) => `<button class="memo-carta" type="button" data-e="${c.e}" aria-label="Carta"><span class="memo-dorso">♥</span><span class="memo-cara">${c.e}<small>${c.n}</small></span></button>`)
+        .join("")}</div>`;
+    document.body.append(juego);
+    const panel = juego.querySelector(".juego-panel");
+    const marcador = juego.querySelector(".juego-marcador");
+    const tablero = juego.querySelector(".memoria");
+    const cerrar = () => {
+      juego.classList.add("fuera");
+      setTimeout(() => juego.remove(), 500);
+    };
+    juego.querySelector(".juego-saltar").addEventListener("click", cerrar);
+    juego.querySelector(".juego-empezar").addEventListener("click", () => {
+      panel.hidden = true;
+      marcador.hidden = false;
+      tablero.hidden = false;
+    });
+    let abiertas = [];
+    let parejas = 0;
+    let intentos = 0;
+    tablero.addEventListener("click", (e) => {
+      const carta = e.target.closest(".memo-carta");
+      if (!carta || carta.classList.contains("vuelta") || abiertas.length === 2) return;
+      carta.classList.add("vuelta");
+      abiertas.push(carta);
+      if (abiertas.length < 2) return;
+      intentos++;
+      document.getElementById("memo-intentos").textContent = intentos;
+      const [a, b] = abiertas;
+      if (a.dataset.e === b.dataset.e) {
+        parejas++;
+        document.getElementById("memo-parejas").textContent = parejas;
+        a.classList.add("hecha");
+        b.classList.add("hecha");
+        const r = b.getBoundingClientRect();
+        lanzarParticulas(r.left + r.width / 2, r.top + r.height / 2, { cantidad: 24, colores: COLORES, potencia: 0.6, vida: 80 });
+        abiertas = [];
+        if (parejas === PAREJAS.length) {
+          setTimeout(() => {
+            tablero.hidden = true;
+            marcador.hidden = true;
+            const premio =
+              intentos <= 9 ? "¡Memoria de elefante! Premio: una cita sorpresa elegida por ti 🏆🌹"
+              : intentos <= 14 ? "¡Muy bien! Premio: noche de pelis y mimos ilimitados 🎬❤️"
+              : "Lo lograste, manquita 😂 Premio: un abrazo largo y un beso en la frente 🤗💋";
+            panel.innerHTML = `<p class="juego-tit">¡Completado!</p><h3>${intentos} intentos</h3><p>Lo nuestro siempre encaja. ${premio}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Volver a mi regalo ♥</button></div>`;
+            panel.hidden = false;
+            panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
+            fuegosArtificiales(5);
+            logro("memoria", "🧠", "Memoria de nosotros completada");
+          }, 700);
+        }
+      } else {
+        setTimeout(() => {
+          a.classList.remove("vuelta");
+          b.classList.remove("vuelta");
+          abiertas = [];
+        }, 800);
+      }
+    });
+  }
 
   // Minijuego "¡Atrapa a Coquito!": tocar 8 veces su cara, que salta cada vez más rápido
   function atraparCoquito() {
