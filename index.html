@@ -3160,6 +3160,28 @@
     cursor: pointer;
     animation: cae linear forwards;
   }
+  .sala { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 720px; margin: 0 auto; }
+  @media (min-width: 820px) { .sala { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .sala-juego {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 10px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: linear-gradient(160deg, rgba(127, 209, 107, 0.14), rgba(59, 22, 87, 0.6));
+    color: var(--ink);
+    font: inherit;
+    font-weight: 800;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .sala-juego span { font-size: 2rem; animation: flotar 2.4s ease-in-out infinite; }
+  .sala-juego:nth-child(2n) span { animation-delay: -1.2s; }
+  .sala-juego:hover, .sala-juego:active { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(127, 209, 107, 0.25); }
+  .juego-repetir { background: linear-gradient(180deg, #7fd16b, #3d8a2a); border: 0; color: #0b1a07; }
   .juego-zona { position: relative; z-index: 2; display: grid; place-items: center; width: min(380px, 100%); }
   .juego-zona[hidden] { display: none; }
   /* Despierta a la mapachita */
@@ -4591,6 +4613,21 @@
     <p class="estado-vales" id="estado-besos" aria-live="polite">Beshitos recibidos: 0</p>
   </section>
 
+  <section class="seccion revelar" id="sala-juegos">
+    <h2>Sala de juegos <span class="emoji">🕹️</span></h2>
+    <p class="intro">Cada vez que vuelves te toca uno nuevo… pero aquí puedes jugar al que quieras, las veces que quieras.</p>
+    <div class="sala">
+      <button class="sala-juego" type="button" data-juego="abrirMinijuego"><span>💋</span>Atrapa los besitos</button>
+      <button class="sala-juego" type="button" data-juego="atraparCoquito"><span>🏃‍♂️</span>¡Atrapa a Coquito!</button>
+      <button class="sala-juego" type="button" data-juego="despiertaMapachita"><span>🦝</span>Despierta a la mapachita</button>
+      <button class="sala-juego" type="button" data-juego="cocinaCoquito"><span>🍳</span>Haz a Coquito cocinar</button>
+      <button class="sala-juego" type="button" data-juego="memoriaNosotros"><span>🧠</span>Memoria de nosotros</button>
+      <button class="sala-juego" type="button" data-juego="unePuntos"><span>📍</span>Une los puntos</button>
+      <button class="sala-juego" type="button" data-juego="alimentaWhite"><span>🍪</span>Alimenta a White</button>
+      <button class="sala-juego" type="button" data-juego="whackWhite"><span>🐱</span>Whack-a-White</button>
+    </div>
+  </section>
+
   <footer>
     <p class="pie"><span class="pie-destino">Un simple juego nos cruzó en el camino… y terminó siendo nuestra historia. 🎮✨</span>Hecho con todo el cariño del mundo, para mi destino favorito. ❤️‍🔥</p>
   </footer>
@@ -5684,7 +5721,27 @@
   }, { once: true });
 
   // Base común de los minijuegos nuevos: pantalla de inicio, marcador, cierre y pantalla final
-  function crearJuego({ titulo, texto, boton = "¡Jugar!" }) {
+  // Sala de juegos: cualquier minijuego cuando ella quiera
+  document.querySelectorAll(".sala-juego").forEach((b) =>
+    b.addEventListener("click", () => {
+      const fn = window[b.dataset.juego];
+      if (typeof fn === "function" && !document.querySelector(".juego")) fn();
+    })
+  );
+
+  // Botón "Jugar otra vez": cierra la partida y abre el mismo juego de nuevo
+  function botonRepetir(nombre) {
+    return `<button class="btn-mimo juego-repetir" type="button" data-juego="${nombre}">Jugar otra vez 🔁</button>`;
+  }
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest(".juego-repetir");
+    if (!b) return;
+    b.closest(".juego")?.remove();
+    const fn = window[b.dataset.juego];
+    if (typeof fn === "function") setTimeout(fn, 100);
+  });
+
+  function crearJuego({ nombre, titulo, texto, boton = "¡Jugar!" }) {
     const juego = document.createElement("div");
     juego.className = "juego";
     juego.innerHTML = `
@@ -5721,7 +5778,7 @@
       terminar: ({ titulo, texto, boton = "Volver a mi regalo ♥", fuegos = false, logroId, logroTxt, logroIco = "🕹️" }) => {
         zona.innerHTML = "";
         marcador.hidden = true;
-        panel.innerHTML = `<p class="juego-tit">Fin del juego</p><h3>${titulo}</h3><p>${texto}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">${boton}</button></div>`;
+        panel.innerHTML = `<p class="juego-tit">Fin del juego</p><h3>${titulo}</h3><p>${texto}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">${boton}</button>${nombre ? botonRepetir(nombre) : ""}</div>`;
         panel.hidden = false;
         panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
         if (fuegos) fuegosArtificiales(6);
@@ -5733,6 +5790,7 @@
   // Minijuego 13 "Despierta a la mapachita": que no se duerma antes de las 4 a.m.
   function despiertaMapachita() {
     const j = crearJuego({
+      nombre: "despiertaMapachita",
       titulo: "Despierta a la mapachita",
       texto: "Son las 23:00 y la mapachita quiere aguantar hasta las 4 a.m. 🦝<br>Toca para despertarla cada vez que se le cierren los ojos. ¡Que no se duerma!",
       boton: "¡Aguantar despierta!",
@@ -5765,7 +5823,7 @@
       const bucle = setInterval(() => {
         if (!document.getElementById("reloj-mapachita")) return clearInterval(bucle);
         minutos += 1.5;
-        sueno += 1.2 + minutos / 180;
+        sueno += 0.75 + minutos / 300;
         const h = (23 + Math.floor(minutos / 60)) % 24;
         const m = Math.floor(minutos % 60);
         document.getElementById("reloj-mapachita").textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
@@ -5797,6 +5855,7 @@
   // Minijuego 4 "Une los puntos": de Argentina a Zaragoza, dibujando un corazón
   function unePuntos() {
     const j = crearJuego({
+      nombre: "unePuntos",
       titulo: "Une los puntos",
       texto: "Toca los puntos en orden, del 1 al 12, para unir Argentina con Zaragoza. ¿Qué dibujo saldrá? 👀",
     });
@@ -5853,6 +5912,7 @@
   // Minijuego 7 "Whack-a-White": White sale de los agujeros robando galletas
   function whackWhite() {
     const j = crearJuego({
+      nombre: "whackWhite",
       titulo: "Whack-a-White",
       texto: "¡White se está robando las galletas! 🐱🍪<br>Tócalo cuando asome (con cariño). Pero si sale Coquito, ¡no lo toques, que él viene a traer más galletas!",
     });
@@ -5911,6 +5971,7 @@
   function alimentaWhite() {
     const META = 12;
     const j = crearJuego({
+      nombre: "alimentaWhite",
       titulo: "Alimenta a White",
       texto: `White tiene hambre y poca paciencia 🐱<br>Toca las galletas 🍪 para dárselas. Dale ${META} antes de que se enfade y vaya a contarle a mamá.`,
     });
@@ -5984,6 +6045,7 @@
   // Minijuego 15 "Haz a Coquito cocinar": todo se quema… salvo pedir sushi
   function cocinaCoquito() {
     const j = crearJuego({
+      nombre: "cocinaCoquito",
       titulo: "Haz a Coquito cocinar",
       texto: "Tu Coquito quiere prepararte la cena 👨‍🍳<br>Elige qué cocina… y que sea lo que Dios quiera 😅",
       boton: "¡A cocinar!",
@@ -6103,7 +6165,7 @@
               intentos <= 9 ? "¡Memoria de elefante! Premio: una cita sorpresa elegida por ti 🏆🌹"
               : intentos <= 14 ? "¡Muy bien! Premio: noche de pelis y mimos ilimitados 🎬❤️"
               : "Lo lograste, manquita 😂 Premio: un abrazo largo y un beso en la frente 🤗💋";
-            panel.innerHTML = `<p class="juego-tit">¡Completado!</p><h3>${intentos} intentos</h3><p>Lo nuestro siempre encaja. ${premio}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Volver a mi regalo ♥</button></div>`;
+            panel.innerHTML = `<p class="juego-tit">¡Completado!</p><h3>${intentos} intentos</h3><p>Lo nuestro siempre encaja. ${premio}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Volver a mi regalo ♥</button>${botonRepetir("memoriaNosotros")}</div>`;
             panel.hidden = false;
             panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
             fuegosArtificiales(5);
@@ -6165,8 +6227,8 @@
       coquito.hidden = true;
       marcador.hidden = true;
       panel.innerHTML = gano
-        ? `<p class="juego-tit">¡Ganaste!</p><h3>Me atrapaste 😳❤️</h3><p>Premio: ${META} besitos ya, y todos los que quieras cuando estemos juntos. Ahora soy tuyo para siempre.</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Cobrar mis besitos 💋</button></div>`
-        : `<p class="juego-tit">Se acabó el tiempo</p><h3>${atrapes}/${META} 😝</h3><p>Me escapé… pero te dejo ${atrapes} besitos igual. Mañana revancha, manquita 🎮</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Volver a mi regalo ♥</button></div>`;
+        ? `<p class="juego-tit">¡Ganaste!</p><h3>Me atrapaste 😳❤️</h3><p>Premio: ${META} besitos ya, y todos los que quieras cuando estemos juntos. Ahora soy tuyo para siempre.</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Cobrar mis besitos 💋</button>${botonRepetir("atraparCoquito")}</div>`
+        : `<p class="juego-tit">Se acabó el tiempo</p><h3>${atrapes}/${META} 😝</h3><p>Me escapé… pero te dejo ${atrapes} besitos igual. Mañana revancha, manquita 🎮</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Volver a mi regalo ♥</button>${botonRepetir("memoriaNosotros")}</div>`;
       panel.hidden = false;
       panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
       if (gano) {
@@ -6280,7 +6342,7 @@
           : puntos >= 18 ? "¡Muy bien! Premio: masajito de pies doble 🦶💆‍♀️"
           : puntos >= 8 ? "Nada mal, manquita 😏 Premio: un beshito en la frente 💋"
           : "Jajaja manquita confirmada 🎮😂 Premio de consolación: un abrazo igual 🤗";
-        panel.innerHTML = `<p class="juego-tit">Fin del juego</p><h3>${puntos} puntos</h3><p>${premio}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Seguir a mi regalo ♥</button></div>`;
+        panel.innerHTML = `<p class="juego-tit">Fin del juego</p><h3>${puntos} puntos</h3><p>${premio}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Seguir a mi regalo ♥</button>${botonRepetir("abrirMinijuego")}</div>`;
         panel.hidden = false;
         panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
         if (puntos >= 18) fuegosArtificiales(5);
