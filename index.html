@@ -3160,6 +3160,19 @@
     cursor: pointer;
     animation: cae linear forwards;
   }
+  .ir-sala {
+    display: table;
+    margin: 18px auto 0;
+    padding: 8px 18px;
+    border: 1px solid #7fd16b;
+    border-radius: 999px;
+    color: #c8f5b8;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: rgba(127, 209, 107, 0.1);
+  }
+  .ir-sala span { margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #7fd16b; color: #0b1a07; font-size: 0.7rem; }
   .sala { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 720px; margin: 0 auto; }
   @media (min-width: 820px) { .sala { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .sala-juego {
@@ -3946,6 +3959,7 @@
       <span class="start-texto">PRESS START</span>
       <span class="start-sub">Player 2 · Jana ♥</span>
     </a>
+    <a class="ir-sala" href="#sala-juegos">🕹️ Elegir minijuego <span>11 juegos</span></a>
   </section>
 
   <section class="seccion revelar" id="fuego">
@@ -5803,6 +5817,17 @@
   }, { once: true });
 
   // Base común de los minijuegos nuevos: pantalla de inicio, marcador, cierre y pantalla final
+  // Acceso directo a la sala: las fotos que se cargan al bajar alargan la página,
+  // así que se vuelve a apuntar a la sala varias veces hasta quedar encima
+  document.querySelector(".ir-sala").addEventListener("click", (e) => {
+    e.preventDefault();
+    const sala = document.getElementById("sala-juegos");
+    // Salto directo: con una página tan larga, el desplazamiento suave a veces no llega
+    const ir = () => sala.scrollIntoView({ behavior: "instant", block: "start" });
+    ir();
+    [900, 1800, 2700].forEach((t) => setTimeout(() => Math.abs(sala.getBoundingClientRect().top) > 40 && ir(), t));
+  });
+
   // Sala de juegos: cualquier minijuego cuando ella quiera
   document.querySelectorAll(".sala-juego").forEach((b) =>
     b.addEventListener("click", () => {
