@@ -3099,6 +3099,17 @@
     background-clip: text;
     color: transparent;
   }
+  .regalo-visita { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
+  .regalo-nota {
+    max-width: 30ch;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid var(--line);
+    font-size: 1rem;
+    line-height: 1.4;
+    animation: subir 0.8s ease 0.3s both;
+  }
   .regalo-pista { font-weight: 800; letter-spacing: 0.12em; font-size: 0.8rem; color: var(--muted); animation: titila 1.4s steps(2, start) infinite; }
   @keyframes regalo-salta {
     0%, 100% { transform: translateY(0) rotate(0); }
@@ -4560,7 +4571,7 @@
   // Apodos que se van turnando en la portada
   const APODOS = ["andaluza hermosa", "mocosa diablilla morenita", "mapachita", "manquita favorita", "pechocha más hermosha", "súper chef", "Harley de mi vida"];
   const apodo = document.getElementById("apodo");
-  let nApodo = 0;
+  let nApodo = Math.floor(Math.random() * APODOS.length);
   if (!reduceMotion) {
     setInterval(() => {
       apodo.classList.add("saliendo");
@@ -4962,7 +4973,7 @@
     "Tranqui, manquita, yo te carreo 💪",
     "GG, mi amor. Bueno… casi 😂",
   ];
-  let fraseManquita = 0;
+  let fraseManquita = Math.floor(Math.random() * FRASES_MANQUITA.length);
   function asomarManquita() {
     bocadilloManquita.textContent = FRASES_MANQUITA[fraseManquita++ % FRASES_MANQUITA.length];
     manquita.classList.add("asomada");
@@ -4992,7 +5003,7 @@
     ["gracioso", "¿Otra vez despierta? A dormir, mapachita 😤🦝"],
     ["beso", "Eres mi destino favorito ❤️‍🔥"],
   ];
-  let fraseLeo = 0;
+  let fraseLeo = Math.floor(Math.random() * FRASES_LEO.length);
   function asomarLeo() {
     const [foto, frase] = FRASES_LEO[fraseLeo++ % FRASES_LEO.length];
     caraLeo.querySelector("img").src = `assets/leo-${foto}.webp`;
@@ -5039,7 +5050,7 @@
     "Yo escondiéndome de White porque se me acabaron las galletas 🍪🙈",
     "Tú cuando te digo «manquita» después de perder una partida 🎮😂",
   ];
-  let fraseEscondido = 0;
+  let fraseEscondido = Math.floor(Math.random() * FRASES_ESCONDIDO.length);
   function asomarEscondido() {
     bocadilloEscondido.textContent = FRASES_ESCONDIDO[fraseEscondido++ % FRASES_ESCONDIDO.length];
     videoEscondido.play().catch(() => {});
@@ -5362,6 +5373,42 @@
     }
   }
 
+  // Cada visita trae algo nuevo: la página recuerda (solo en su móvil) cuántas veces la ha abierto
+  let visita = 1;
+  try {
+    visita = (parseInt(localStorage.getItem("visitas-jana"), 10) || 0) + 1;
+    localStorage.setItem("visitas-jana", visita);
+  } catch {
+    visita = 1 + Math.floor(Math.random() * 30);
+  }
+  const SORPRESAS = [
+    "Hoy el mundo celebra que existes. Yo lo celebro todos los días. 🎂",
+    "¿Otra vez por aquí? Eso significa que me extrañas 😏",
+    "Dato curioso: cada vez que abres esto, te quiero un poquito más. ❤️",
+    "Te debo un abrazo de esos que duran mil años. Apuntado queda. 🤗",
+    "Si estás leyendo esto de madrugada… A DORMIR, mapachita 🦝😤",
+    "Recordatorio oficial: eres la más bonita del universo. ✨",
+    "Hoy toca: un beshito imaginario en la frente. Muack 💋",
+    "Te prometo sushi, playa y amanecer. Pronto. 🍣🏖️🌅",
+    "White me ha dicho que te diga que te quiere (y que quiere galletas) 🐱🍪",
+    "Manquita, ¿echamos una partida? Prometo dejarte ganar… o no 🎮😂",
+    "No existe un atardecer más bonito que tú. Lo sigo sosteniendo. 🌅",
+    "Hoy pienso en tus piecitos. Masaje pendiente. 🦶💆‍♀️",
+    "Mi destino favorito sigue siendo el mismo: tú. ❤️‍🔥",
+    "Eres mi presente, mi futuro y mi notificación favorita. 📱💕",
+    "Sorpresa: sigo contando los días que faltan para verte. ⏳",
+    "Te mando 10 mil kilómetros de abrazos. Uno por cada kilómetro. 🗺️🤗",
+    "Hoy te tocan mimos dobles. No se aceptan devoluciones. 🎟️",
+    "Pechocha andaluza más hermosha: te quiero. Ya está, lo dije. 😳",
+    "Si sonríes ahora mismo, misión cumplida. 😊",
+    "Contigo hasta la monotonía es la mejor vida del mundo. ♾️",
+    "Gracias por jugar conmigo… y por elegirme. 🎮❤️",
+    "Coquito reportándose: te amo hoy, mañana y siempre. 🫡❤️",
+  ];
+  const TITULOS = ["Tienes un regalo, Jana", "¡Volviste, mapachita!", "Otra sorpresa para ti", "Hola otra vez, diablilla", "Un regalito más, mocosa"];
+  const sorpresa = SORPRESAS[(visita - 1) % SORPRESAS.length];
+  const tituloRegalo = visita === 1 ? TITULOS[0] : TITULOS[1 + ((visita - 2) % (TITULOS.length - 1))];
+
   // Pantalla de regalo: se abre al tocarla y descubre la página
   const regalo = document.createElement("div");
   regalo.className = "regalo";
@@ -5371,7 +5418,9 @@
         <span class="regalo-tapa"><span class="regalo-lazo"></span></span>
         <span class="regalo-cuerpo"></span>
       </span>
-      <span class="regalo-texto">Tienes un regalo, Jana</span>
+      <span class="regalo-texto">${tituloRegalo}</span>
+      <span class="regalo-visita">Visita nº ${visita} · sorpresa del día</span>
+      <span class="regalo-nota">${sorpresa}</span>
       <span class="regalo-pista">Toca para abrirlo ♥</span>
     </button>`;
   document.body.append(regalo);
