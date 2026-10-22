@@ -3182,7 +3182,8 @@
   .sala-juego:nth-child(2n) span { animation-delay: -1.2s; }
   .sala-juego:hover, .sala-juego:active { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(127, 209, 107, 0.25); }
   .juego-repetir { background: linear-gradient(180deg, #7fd16b, #3d8a2a); border: 0; color: #0b1a07; }
-  .juego-zona { position: relative; z-index: 2; display: grid; place-items: center; width: min(380px, 100%); }
+  .juego-zona { position: relative; z-index: 2; display: grid; justify-items: stretch; align-items: center; width: min(380px, 100%); }
+  .juego-zona > * { min-width: 0; }
   .juego-zona[hidden] { display: none; }
   /* Despierta a la mapachita */
   .mapachita-juego { text-align: center; width: 100%; }
@@ -3216,6 +3217,84 @@
   .une-punto.mal circle { animation: une-mal 0.4s ease; }
   @keyframes une-mal { 50% { fill: #555; transform: translateX(4px); } }
   .une-etq { fill: var(--muted); font: 700 12px var(--font-body); text-anchor: middle; }
+  /* Sushi en la cinta */
+  .sushi-juego { width: 100%; text-align: center; }
+  .sushi-pedido { margin: 0 0 14px; font-weight: 800; color: var(--ink); }
+  .sushi-pedido b { font-size: 1.8rem; }
+  .cinta-sushi {
+    position: relative;
+    height: 84px;
+    margin-bottom: 14px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #3a2a1a;
+    box-shadow: inset 0 0 0 3px #6b4a2a;
+  }
+  .cinta-rayas { position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 30px, rgba(0, 0, 0, 0.25) 30px 34px); animation: olas 1.2s linear infinite; }
+  .cinta-sushi + .cinta-sushi .cinta-rayas { animation-direction: reverse; }
+  .plato-cinta {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 68px;
+    height: 68px;
+    padding: 0;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: #fffaf0;
+    font-size: 2rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    animation: cinta linear forwards;
+  }
+  .plato-cinta.bien { background: #7fd16b; transform: scale(1.2); }
+  .plato-cinta.mal { background: #e0364f; }
+  @keyframes cinta { from { left: 105%; } to { left: -80px; } }
+  @keyframes cinta-inversa { from { left: -80px; } to { left: 105%; } }
+  /* Pedido a domicilio */
+  .carretera-juego {
+    position: relative;
+    width: 100%;
+    height: min(62vh, 480px);
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(90deg, #3b8a3b 0 6%, #3a3a46 6% 94%, #3b8a3b 94%);
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+  .carril-linea { position: absolute; top: 0; bottom: 0; width: 4px; background: repeating-linear-gradient(#f6c667 0 30px, transparent 30px 60px); animation: carril 0.6s linear infinite; }
+  .carril-linea.l1 { left: 33.33%; }
+  .carril-linea.l2 { left: 66.66%; }
+  @keyframes carril { from { background-position: 0 0; } to { background-position: 0 60px; } }
+  .moto { position: absolute; bottom: 6%; width: 64px; transform: translateX(-50%); text-align: center; transition: left 0.15s ease; pointer-events: none; }
+  .moto img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; object-position: 50% 40%; }
+  .moto span { display: block; margin-top: -6px; font-size: 2.4rem; line-height: 1; }
+  .moto.choque { animation: bleh 0.4s ease; }
+  .obstaculo { position: absolute; top: -10%; font-size: 2rem; transform: translateX(-50%); pointer-events: none; }
+  /* Pizza a la carrera */
+  .pizza-juego { width: 100%; text-align: center; }
+  .pizza-pedido { margin: 0 0 8px; font-weight: 800; color: var(--ink); }
+  .pizza-pedido span { font-size: 1.8rem; }
+  .horno { height: 10px; width: 80%; margin: 0 auto 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+  .horno span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #f6c667, #f0743a, #e0364f); }
+  .pizza {
+    display: grid;
+    place-items: center;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffcf6b 0 55%, #e0a040 56% 66%, #c07a2a 67%);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+    transition: filter 0.3s, transform 0.3s;
+  }
+  .pizza.lista { transform: scale(1.1) rotate(20deg); }
+  .pizza.quemada { filter: brightness(0.3) sepia(1); }
+  .pizza-toppings { font-size: 2rem; letter-spacing: 4px; }
+  .pizza-msg { min-height: 1.5em; margin: 10px 0; font-weight: 800; color: var(--gold); }
+  .ingredientes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .ingrediente { padding: 10px 0; border: 1px solid var(--line); border-radius: 14px; background: rgba(255, 255, 255, 0.08); font-size: 1.8rem; cursor: pointer; touch-action: manipulation; }
+  .ingrediente:active { transform: scale(0.9); }
   /* Alimenta a White */
   .white-comedor { width: 100%; text-align: center; }
   .white-plato { position: relative; display: inline-block; }
@@ -4625,6 +4704,9 @@
       <button class="sala-juego" type="button" data-juego="unePuntos"><span>📍</span>Une los puntos</button>
       <button class="sala-juego" type="button" data-juego="alimentaWhite"><span>🍪</span>Alimenta a White</button>
       <button class="sala-juego" type="button" data-juego="whackWhite"><span>🐱</span>Whack-a-White</button>
+      <button class="sala-juego" type="button" data-juego="sushiCinta"><span>🍣</span>Sushi en la cinta</button>
+      <button class="sala-juego" type="button" data-juego="pedidoDomicilio"><span>🛵</span>Pedido a domicilio</button>
+      <button class="sala-juego" type="button" data-juego="pizzaCarrera"><span>🍕</span>Pizza a la carrera</button>
     </div>
   </section>
 
@@ -5716,7 +5798,7 @@
     setTimeout(() => regalo.remove(), 1800);
     // A partir de la segunda visita, después del regalo llega el minijuego
     // Los minijuegos se turnan, uno distinto en cada visita a partir de la segunda
-    const MINIJUEGOS = [abrirMinijuego, atraparCoquito, despiertaMapachita, cocinaCoquito, memoriaNosotros, unePuntos, alimentaWhite, whackWhite];
+    const MINIJUEGOS = [abrirMinijuego, sushiCinta, atraparCoquito, despiertaMapachita, pizzaCarrera, cocinaCoquito, memoriaNosotros, pedidoDomicilio, unePuntos, alimentaWhite, whackWhite];
     if (visita >= 2) setTimeout(MINIJUEGOS[(visita - 2) % MINIJUEGOS.length], 2400);
   }, { once: true });
 
@@ -6100,6 +6182,272 @@
           }, 1100);
         })
       );
+    });
+  }
+
+  // Minijuego "Sushi en la cinta": tocar solo lo que ella pidió
+  function sushiCinta() {
+    const TODO = ["🍣", "🍤", "🍙", "🥟", "🍥", "🍱", "🦐", "🥢"];
+    const pedido = [...TODO].sort(() => Math.random() - 0.5).slice(0, 2);
+    const META = 10;
+    const j = crearJuego({
+      nombre: "sushiCinta",
+      titulo: "Sushi en la cinta",
+      texto: `Parada de la escapada: el sushi pasa por la cinta 🍣<br>Tu pedido es <b style="font-size:1.4em">${pedido.join(" ")}</b>. Toca solo eso (${META} platos). Si coges otra cosa, te lo cobran 😅`,
+    });
+    j.zona.innerHTML = `
+      <div class="sushi-juego">
+        <p class="sushi-pedido">Tu pedido: <b>${pedido.join(" ")}</b></p>
+        <div class="cinta-sushi" id="cinta"><span class="cinta-rayas"></span></div>
+        <div class="cinta-sushi" id="cinta2"><span class="cinta-rayas"></span></div>
+      </div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let bien = 0;
+      let mal = 0;
+      let tiempo = 25;
+      const pintar = () => j.marcar(`🍣 ${bien}/${META} · ❌ ${mal} · ${tiempo}s`);
+      pintar();
+      const cintas = [document.getElementById("cinta"), document.getElementById("cinta2")];
+      const poner = () => {
+        // Más o menos la mitad de los platos son del pedido
+        const plato = Math.random() < 0.5 ? pedido[Math.floor(Math.random() * 2)] : TODO[Math.floor(Math.random() * TODO.length)];
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "plato-cinta";
+        b.innerHTML = `<span>${plato}</span>`;
+        const cinta = cintas[Math.floor(Math.random() * 2)];
+        b.style.animationDuration = 3.2 + Math.random() * 1.2 + "s";
+        if (cinta === cintas[1]) b.style.animationName = "cinta-inversa";
+        b.addEventListener("pointerdown", () => {
+          if (pedido.includes(plato)) {
+            bien++;
+            b.classList.add("bien");
+          } else {
+            mal++;
+            b.classList.add("mal");
+          }
+          b.disabled = true;
+          setTimeout(() => b.remove(), 300);
+          pintar();
+          if (bien >= META) fin();
+        });
+        b.addEventListener("animationend", () => b.remove());
+        cinta.append(b);
+      };
+      const aparecer = setInterval(poner, 700);
+      const reloj = setInterval(() => {
+        if (!document.getElementById("cinta")) return fin(true);
+        tiempo--;
+        pintar();
+        if (tiempo <= 0) fin();
+      }, 1000);
+      let acabado = false;
+      function fin(sinPantalla) {
+        if (acabado) return;
+        acabado = true;
+        clearInterval(aparecer);
+        clearInterval(reloj);
+        if (sinPantalla) return;
+        const gano = bien >= META;
+        j.terminar({
+          titulo: gano ? "¡Pedido completo! 🍣" : `${bien} de ${META} platos`,
+          texto: gano
+            ? mal === 0 ? "Perfecto, sin un solo error. Así se pide en una escapada: ahora a la playa 🏖️❤️" : `Con ${mal} platos de más… que paga Coquito, claro 😅 Ahora, a la playa 🏖️`
+            : "Se acabó la cinta. Tranqui: en la escapada de verdad pedimos todo lo que quieras 🍣❤️",
+          fuegos: gano,
+          logroId: gano ? "sushi" : null,
+          logroIco: "🍣",
+          logroTxt: "Experta en sushi de cinta",
+        });
+      }
+    });
+  }
+
+  // Minijuego "Pedido a domicilio": Coquito en moto esquivando obstáculos
+  function pedidoDomicilio() {
+    const j = crearJuego({
+      nombre: "pedidoDomicilio",
+      titulo: "Pedido a domicilio",
+      texto: "Tu Coquito va en moto 🛵 a llevarte la cena antes de que la mapachita se duerma.<br>Toca la izquierda o la derecha de la pantalla para cambiar de carril y esquivar. Coge las 🍣 por el camino.",
+      boton: "¡Arrancar! 🛵",
+    });
+    j.zona.innerHTML = `
+      <div class="carretera-juego" id="carretera-juego">
+        <span class="carril-linea l1"></span><span class="carril-linea l2"></span>
+        <div class="moto" id="moto"><img src="assets/leo-gracioso.webp" alt=""><span>🛵</span></div>
+      </div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      const pista = document.getElementById("carretera-juego");
+      const moto = document.getElementById("moto");
+      let carril = 1;
+      let vidas = 3;
+      let sushi = 0;
+      let distancia = 0;
+      const META = 600;
+      const cosas = [];
+      const colocarMoto = () => (moto.style.left = carril * 33.33 + 16.66 + "%");
+      colocarMoto();
+      const pintar = () => j.marcar(`${"❤️".repeat(vidas)} · 🍣 ${sushi} · ${Math.min(100, Math.round((distancia / META) * 100))}%`);
+      pintar();
+      pista.addEventListener("pointerdown", (e) => {
+        const r = pista.getBoundingClientRect();
+        carril = Math.max(0, Math.min(2, carril + (e.clientX - r.left < r.width / 2 ? -1 : 1)));
+        colocarMoto();
+      });
+      const OBST = ["🚧", "🕳️", "🐈", "🚗", "🛑"];
+      const bucle = setInterval(() => {
+        if (!document.getElementById("moto")) return clearInterval(bucle);
+        distancia += 2;
+        const velocidad = 2.2 + distancia / 220;
+        if (Math.random() < 0.06 + distancia / 12000) {
+          const esSushi = Math.random() < 0.3;
+          const el = document.createElement("span");
+          el.className = "obstaculo";
+          el.textContent = esSushi ? "🍣" : OBST[Math.floor(Math.random() * OBST.length)];
+          const c = Math.floor(Math.random() * 3);
+          el.style.left = c * 33.33 + 16.66 + "%";
+          pista.append(el);
+          cosas.push({ el, carril: c, y: -10, esSushi });
+        }
+        for (let i = cosas.length - 1; i >= 0; i--) {
+          const o = cosas[i];
+          o.y += velocidad;
+          o.el.style.top = o.y + "%";
+          // La moto ocupa la franja de abajo (76 %–92 %)
+          if (o.carril === carril && o.y > 74 && o.y < 90) {
+            if (o.esSushi) {
+              sushi++;
+            } else {
+              vidas--;
+              moto.classList.remove("choque");
+              void moto.offsetWidth;
+              moto.classList.add("choque");
+            }
+            o.el.remove();
+            cosas.splice(i, 1);
+            pintar();
+            continue;
+          }
+          if (o.y > 105) {
+            o.el.remove();
+            cosas.splice(i, 1);
+          }
+        }
+        pintar();
+        if (vidas <= 0 || distancia >= META) {
+          clearInterval(bucle);
+          const gano = vidas > 0;
+          j.terminar({
+            titulo: gano ? "¡Pedido entregado! 🛵❤️" : "La moto no llegó 😵",
+            texto: gano
+              ? `Llegó a tiempo y con ${sushi} sushis extra por el camino. Propina para el repartidor: un beshito 💋`
+              : "Tu Coquito se comió un bache… pero tranquila, ya pidió otro pedido. Tú ve poniendo la mesa 🍽️😂",
+            fuegos: gano,
+            logroId: gano ? "domicilio" : null,
+            logroIco: "🛵",
+            logroTxt: "Pedido entregado por Coquito Express",
+          });
+        }
+      }, 50);
+    });
+  }
+
+  // Minijuego "Pizza a la carrera": poner los ingredientes del pedido antes de que se queme
+  function pizzaCarrera() {
+    const INGREDIENTES = ["🍅", "🧀", "🍄", "🫒", "🌶️", "🍍", "🥓", "🌿"];
+    const j = crearJuego({
+      nombre: "pizzaCarrera",
+      titulo: "Pizza a la carrera",
+      texto: "Llegan pedidos de pizza 🍕<br>Pon los ingredientes que pide cada uno antes de que se queme. ¿Cuántas sacas en 30 segundos?",
+    });
+    j.zona.innerHTML = `
+      <div class="pizza-juego">
+        <p class="pizza-pedido" id="pizza-pedido"></p>
+        <div class="horno"><span id="horno-barra"></span></div>
+        <div class="pizza" id="pizza"><span class="pizza-toppings" id="pizza-toppings"></span></div>
+        <p class="pizza-msg" id="pizza-msg"></p>
+        <div class="ingredientes">${INGREDIENTES.map((i) => `<button class="ingrediente" type="button" data-i="${i}">${i}</button>`).join("")}</div>
+      </div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let tiempo = 30;
+      let hechas = 0;
+      let quemadas = 0;
+      let pedido = [];
+      let puestos = [];
+      let horno = 0;
+      const msg = document.getElementById("pizza-msg");
+      const pintar = () => j.marcar(`🍕 ${hechas} · 🔥 ${quemadas} · ${tiempo}s`);
+      const nuevaPizza = () => {
+        pedido = [...INGREDIENTES].sort(() => Math.random() - 0.5).slice(0, 3);
+        puestos = [];
+        horno = 0;
+        document.getElementById("pizza-pedido").innerHTML = `Pedido: ${pedido.map((i) => `<span>${i}</span>`).join(" ")}`;
+        document.getElementById("pizza-toppings").textContent = "";
+        document.getElementById("pizza").className = "pizza";
+      };
+      nuevaPizza();
+      pintar();
+      j.zona.querySelectorAll(".ingrediente").forEach((b) =>
+        b.addEventListener("click", () => {
+          const ing = b.dataset.i;
+          if (puestos.includes(ing)) return;
+          if (!pedido.includes(ing)) {
+            msg.textContent = `¡${ing} no lo pidió! 😱`;
+            horno += 18;
+            return;
+          }
+          puestos.push(ing);
+          document.getElementById("pizza-toppings").textContent = puestos.join(" ");
+          if (puestos.length === pedido.length) {
+            hechas++;
+            msg.textContent = ["¡Perfecta! 🤌", "¡Mamma mia! 🇮🇹", "¡Para la súper chef! 👩‍🍳", "¡Otra más! 🍕"][hechas % 4];
+            document.getElementById("pizza").className = "pizza lista";
+            const r = document.getElementById("pizza").getBoundingClientRect();
+            lanzarParticulas(r.left + r.width / 2, r.top + r.height / 2, { cantidad: 30, colores: ["#f6c667", "#e0364f", "#7fd16b"], potencia: 0.7, vida: 90 });
+            pintar();
+            setTimeout(nuevaPizza, 500);
+          }
+        })
+      );
+      // El horno se calienta: si llega al 100 %, la pizza se quema y llega otro pedido
+      const calor = setInterval(() => {
+        if (!document.getElementById("horno-barra")) return clearInterval(calor);
+        horno += 1.6;
+        document.getElementById("horno-barra").style.width = Math.min(100, horno) + "%";
+        if (horno >= 100) {
+          quemadas++;
+          msg.textContent = "¡Se quemó! 🔥 Otro pedido…";
+          document.getElementById("pizza").className = "pizza quemada";
+          pintar();
+          setTimeout(nuevaPizza, 600);
+          horno = -40;
+        }
+      }, 100);
+      const reloj = setInterval(() => {
+        if (!document.getElementById("horno-barra")) return clearInterval(reloj);
+        tiempo--;
+        pintar();
+        if (tiempo > 0) return;
+        clearInterval(calor);
+        clearInterval(reloj);
+        j.terminar({
+          titulo: `${hechas} pizzas 🍕`,
+          texto:
+            hechas >= 7 ? "¡Pizzería de 5 estrellas! Coquito se apunta como cliente fijo (paga en besos) 💋⭐"
+            : hechas >= 4 ? "¡Muy bien, chef! Así cualquiera se queda a cenar contigo 🍕❤️"
+            : `${quemadas} quemadas… tranquila, sigues cocinando mil veces mejor que Coquito 😂`,
+          fuegos: hechas >= 7,
+          logroId: hechas >= 4 ? "pizza" : null,
+          logroIco: "🍕",
+          logroTxt: "Pizzera de la escapada",
+        });
+      }, 1000);
     });
   }
 
