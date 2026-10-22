@@ -3194,6 +3194,25 @@
   .une-punto.mal circle { animation: une-mal 0.4s ease; }
   @keyframes une-mal { 50% { fill: #555; transform: translateX(4px); } }
   .une-etq { fill: var(--muted); font: 700 12px var(--font-body); text-anchor: middle; }
+  /* Alimenta a White */
+  .white-comedor { width: 100%; text-align: center; }
+  .white-plato { position: relative; display: inline-block; }
+  .white-hambre { width: 130px; height: 130px; border-radius: 50%; border: 4px solid #fff; object-fit: cover; object-position: 60% 30%; }
+  .white-hambre.come { animation: bleh 0.35s ease; }
+  .white-dice { position: absolute; left: 50%; top: -14px; transform: translate(-50%, -100%); padding: 5px 12px; border-radius: 12px; background: #fff; color: #2a0e3e; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+  .paciencia { height: 12px; width: 80%; margin: 14px auto; border-radius: 999px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+  .paciencia span { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, #e0364f, #f6c667, #7fd16b); transition: width 0.1s linear; }
+  .galletas-zona { position: relative; height: 230px; border-radius: 18px; background: rgba(255, 255, 255, 0.05); border: 1px dashed var(--line); }
+  .galleta { position: absolute; padding: 4px; border: 0; background: none; font-size: 2.4rem; cursor: pointer; touch-action: manipulation; animation: galleta 2.2s ease forwards; }
+  @keyframes galleta { 0% { transform: scale(0); } 15% { transform: scale(1.15); } 25%, 80% { transform: scale(1); } 100% { transform: scale(0); opacity: 0; } }
+  /* Haz a Coquito cocinar */
+  .cocina-juego { width: 100%; text-align: center; }
+  .sarten { font-size: 5rem; line-height: 1.2; }
+  .sarten.cocinando { animation: vibrar 0.2s linear infinite; }
+  .sarten.quemado { animation: bleh 0.5s ease; filter: drop-shadow(0 0 20px #f0743a); }
+  .cocina-resultado { min-height: 3em; margin: 6px 0 14px; font-weight: 600; color: var(--ink); }
+  .platos { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .plato:disabled { opacity: 0.35; text-decoration: line-through; }
   /* Whack-a-White */
   .agujeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; }
   .agujero {
@@ -5660,7 +5679,7 @@
     setTimeout(() => regalo.remove(), 1800);
     // A partir de la segunda visita, después del regalo llega el minijuego
     // Los minijuegos se turnan, uno distinto en cada visita a partir de la segunda
-    const MINIJUEGOS = [abrirMinijuego, atraparCoquito, despiertaMapachita, memoriaNosotros, unePuntos, whackWhite];
+    const MINIJUEGOS = [abrirMinijuego, atraparCoquito, despiertaMapachita, cocinaCoquito, memoriaNosotros, unePuntos, alimentaWhite, whackWhite];
     if (visita >= 2) setTimeout(MINIJUEGOS[(visita - 2) % MINIJUEGOS.length], 2400);
   }, { once: true });
 
@@ -5744,6 +5763,7 @@
       });
       // Cada 100 ms pasan 1,5 minutos del reloj y el sueño sube cada vez más rápido
       const bucle = setInterval(() => {
+        if (!document.getElementById("reloj-mapachita")) return clearInterval(bucle);
         minutos += 1.5;
         sueno += 1.2 + minutos / 180;
         const h = (23 + Math.floor(minutos / 60)) % 24;
@@ -5884,6 +5904,140 @@
           logroTxt: "Whack-a-White: galletas defendidas",
         });
       }, 1000);
+    });
+  }
+
+  // Minijuego 14 "Alimenta a White": tocar las galletas antes de que se le acabe la paciencia
+  function alimentaWhite() {
+    const META = 12;
+    const j = crearJuego({
+      titulo: "Alimenta a White",
+      texto: `White tiene hambre y poca paciencia 🐱<br>Toca las galletas 🍪 para dárselas. Dale ${META} antes de que se enfade y vaya a contarle a mamá.`,
+    });
+    j.zona.innerHTML = `
+      <div class="white-comedor">
+        <div class="white-plato"><img src="assets/white.webp" alt="White" class="white-hambre"><span class="white-dice" id="white-dice">Miau… tengo hambre 😿</span></div>
+        <div class="paciencia"><span id="barra-paciencia"></span></div>
+        <div class="galletas-zona" id="galletas-zona"></div>
+      </div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let comidas = 0;
+      let paciencia = 100;
+      const zonaG = document.getElementById("galletas-zona");
+      const dice = document.getElementById("white-dice");
+      const cara = j.zona.querySelector(".white-hambre");
+      const FRASES = ["¡Ñam! 😻", "Otra, otra 😼", "El extraño cae bien 🍪", "Mmm, más 😽", "¡Delicioso! 🐟", "No pares 😹"];
+      j.marcar(`🍪 0/${META}`);
+      const ponerGalleta = () => {
+        if (zonaG.children.length >= 3) return;
+        const g = document.createElement("button");
+        g.type = "button";
+        g.className = "galleta";
+        g.textContent = Math.random() < 0.2 ? "🐟" : "🍪";
+        g.style.left = 6 + Math.random() * 78 + "%";
+        g.style.top = 6 + Math.random() * 70 + "%";
+        g.addEventListener("pointerdown", () => {
+          comidas++;
+          paciencia = Math.min(100, paciencia + (g.textContent === "🐟" ? 30 : 18));
+          dice.textContent = FRASES[comidas % FRASES.length];
+          cara.classList.remove("come");
+          void cara.offsetWidth;
+          cara.classList.add("come");
+          g.remove();
+          j.marcar(`🍪 ${comidas}/${META}`);
+          if (comidas >= META) fin(true);
+        });
+        zonaG.append(g);
+        setTimeout(() => g.remove(), 2200);
+      };
+      const aparecer = setInterval(ponerGalleta, 650);
+      const bajar = setInterval(() => {
+        // Si el juego ya no está en pantalla, se detiene
+        const barraP = document.getElementById("barra-paciencia");
+        if (!barraP) {
+          clearInterval(aparecer);
+          clearInterval(bajar);
+          return;
+        }
+        paciencia -= 1.6;
+        barraP.style.width = Math.max(0, paciencia) + "%";
+        if (paciencia < 35) dice.textContent = "¡¿Y MIS GALLETAS?! 😾";
+        if (paciencia <= 0) fin(false);
+      }, 100);
+      let acabado = false;
+      function fin(gano) {
+        if (acabado) return;
+        acabado = true;
+        clearInterval(aparecer);
+        clearInterval(bajar);
+        j.terminar(
+          gano
+            ? { titulo: "White está feliz 😻", texto: "Panza llena, gato contento. White aprueba oficialmente al extraño… mientras siga trayendo galletas 🍪❤️", fuegos: true, logroId: "alimenta", logroIco: "😻", logroTxt: "White alimentado y feliz" }
+            : { titulo: "White se enfadó 😾", texto: `Solo ${comidas} galletas… White ya fue a decirle a mamá: «el extraño no trae suficientes galletas». Coquito promete traer más 🍪😅` }
+        );
+      }
+    });
+  }
+
+  // Minijuego 15 "Haz a Coquito cocinar": todo se quema… salvo pedir sushi
+  function cocinaCoquito() {
+    const j = crearJuego({
+      titulo: "Haz a Coquito cocinar",
+      texto: "Tu Coquito quiere prepararte la cena 👨‍🍳<br>Elige qué cocina… y que sea lo que Dios quiera 😅",
+      boton: "¡A cocinar!",
+    });
+    const PLATOS = [
+      ["🍳", "Tortilla", "Le dio la vuelta… y aterrizó en el techo. 🙃"],
+      ["🍚", "Arroz", "Se pegó tanto a la olla que ahora es parte de la olla. 🔥"],
+      ["🍝", "Pasta", "Olvidó echarle agua. Pasta crujiente edición especial. 💀"],
+      ["🥗", "Ensalada", "Logró quemar una ensalada. Sí, una ensalada. 😳"],
+      ["🍕", "Pizza", "Sacó la pizza a tiempo… pero se le cayó boca abajo. 🍕💥"],
+      ["🍣", "Pedir sushi", ""],
+    ];
+    j.zona.innerHTML = `
+      <div class="cocina-juego">
+        <div class="sarten" id="sarten">🍳</div>
+        <p class="cocina-resultado" id="cocina-resultado">¿Qué le pides a tu chef?</p>
+        <div class="platos">${PLATOS.map(([e, n], i) => `<button class="btn-mimo plato" type="button" data-i="${i}">${e} ${n}</button>`).join("")}</div>
+      </div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let intentos = 0;
+      const sarten = document.getElementById("sarten");
+      const resultado = document.getElementById("cocina-resultado");
+      j.marcar("Desastres: 0");
+      j.zona.querySelectorAll(".plato").forEach((b) =>
+        b.addEventListener("click", () => {
+          const [emoji, nombre, fallo] = PLATOS[+b.dataset.i];
+          intentos++;
+          b.disabled = true;
+          sarten.textContent = emoji;
+          sarten.className = "sarten cocinando";
+          resultado.textContent = `Cocinando ${nombre.toLowerCase()}…`;
+          setTimeout(() => {
+            if (!fallo) {
+              j.terminar({
+                titulo: "¡Cena perfecta! 🍣",
+                texto: `${intentos === 1 ? "A la primera y sin quemar nada:" : `Tras ${intentos - 1} ${intentos === 2 ? "desastre" : "desastres"} en la cocina,`} tu Coquito por fin dio con su especialidad: pedir sushi. Lo importante es cenar juntos ❤️ (y que la súper chef eres tú 👩‍🍳).`,
+                fuegos: true,
+                logroId: "cocina",
+                logroIco: "🍣",
+                logroTxt: "Chef Coquito: maestro en pedir sushi",
+              });
+              return;
+            }
+            sarten.textContent = "🔥";
+            sarten.className = "sarten quemado";
+            resultado.textContent = fallo;
+            j.marcar(`Desastres: ${intentos}`);
+            const r = sarten.getBoundingClientRect();
+            lanzarParticulas(r.left + r.width / 2, r.top, { cantidad: 30, colores: ["#555", "#888", "#f0743a", "#ffb347"], potencia: 0.6, subida: true, forma: "circulo", vida: 90 });
+          }, 1100);
+        })
+      );
     });
   }
 
