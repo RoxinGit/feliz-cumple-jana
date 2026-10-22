@@ -3100,6 +3100,66 @@
     background-clip: text;
     color: transparent;
   }
+  /* Minijuego */
+  .juego {
+    position: fixed;
+    inset: 0;
+    z-index: 94;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    overflow: hidden;
+    background: rgba(11, 10, 36, 0.88);
+    backdrop-filter: blur(4px);
+    animation: subir 0.4s ease both;
+    transition: opacity 0.5s;
+    touch-action: manipulation;
+  }
+  .juego.fuera { opacity: 0; }
+  .juego-panel {
+    position: relative;
+    z-index: 2;
+    width: min(360px, 100%);
+    padding: 22px;
+    border-radius: 22px;
+    text-align: center;
+    background: linear-gradient(160deg, #3b1657, #1a1140);
+    border: 1px solid var(--line);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+  .juego-panel[hidden] { display: none; }
+  .juego-tit { margin: 0; font-family: "Press Start 2P", monospace; font-size: 0.62rem; color: #7fd16b; }
+  .juego-panel h3 { margin: 10px 0; font-family: "Dancing Script", cursive; font-size: 2.2rem; color: var(--gold); }
+  .juego-panel p { color: var(--muted); }
+  .juego-botones { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .juego-empezar { background: linear-gradient(180deg, #ff5c75, #c4233b); border: 0; }
+  .juego-marcador {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    z-index: 3;
+    transform: translateX(-50%);
+    padding: 6px 16px;
+    border-radius: 999px;
+    background: #1b1b26;
+    border: 1px solid #7fd16b;
+    font-family: "Press Start 2P", monospace;
+    font-size: 0.7rem;
+    color: #fff;
+  }
+  .juego-marcador[hidden] { display: none; }
+  .cae {
+    position: absolute;
+    top: -60px;
+    padding: 6px;
+    border: 0;
+    background: none;
+    font-size: 2.2rem;
+    line-height: 1;
+    cursor: pointer;
+    animation: cae linear forwards;
+  }
+  @keyframes cae { to { transform: translateY(calc(100vh + 80px)) rotate(25deg); } }
   .regalo-visita { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
   .regalo-nota {
     max-width: 30ch;
@@ -5458,7 +5518,84 @@
       document.documentElement.classList.remove("con-regalo");
     }, 900);
     setTimeout(() => regalo.remove(), 1800);
+    // A partir de la segunda visita, después del regalo llega el minijuego
+    if (visita >= 2) setTimeout(abrirMinijuego, 2400);
   }, { once: true });
+
+  // Minijuego "Atrapa los besitos": 15 segundos tocando lo que cae
+  function abrirMinijuego() {
+    const juego = document.createElement("div");
+    juego.className = "juego";
+    juego.innerHTML = `
+      <div class="juego-panel" id="juego-panel">
+        <p class="juego-tit">🎮 Minijuego del día</p>
+        <h3>Atrapa los besitos</h3>
+        <p>Toca todo lo que caiga en 15 segundos:<br>❤️ +1 · 💋 +2 · 🍣 +3 · y cuidado con el 🦝 −2</p>
+        <div class="juego-botones">
+          <button class="btn-mimo juego-empezar" type="button">¡Jugar!</button>
+          <button class="btn-mimo juego-saltar" type="button">Ahora no</button>
+        </div>
+      </div>
+      <div class="juego-marcador" hidden><span id="juego-puntos">0</span> pts · <span id="juego-tiempo">15</span>s</div>`;
+    document.body.append(juego);
+    const panel = juego.querySelector(".juego-panel");
+    const marcador = juego.querySelector(".juego-marcador");
+    const cerrar = () => {
+      juego.classList.add("fuera");
+      setTimeout(() => juego.remove(), 500);
+    };
+    juego.querySelector(".juego-saltar").addEventListener("click", cerrar);
+    juego.querySelector(".juego-empezar").addEventListener("click", () => {
+      panel.hidden = true;
+      marcador.hidden = false;
+      let puntos = 0;
+      let tiempo = 15;
+      const COSAS = [["❤️", 1], ["❤️", 1], ["❤️", 1], ["💋", 2], ["💋", 2], ["🍣", 3], ["🦝", -2]];
+      const caer = setInterval(() => {
+        const [emoji, valor] = COSAS[Math.floor(Math.random() * COSAS.length)];
+        const c = document.createElement("button");
+        c.type = "button";
+        c.className = "cae";
+        c.textContent = emoji;
+        c.style.left = 5 + Math.random() * 85 + "%";
+        c.style.animationDuration = 2.4 + Math.random() * 1.8 + "s";
+        c.addEventListener("pointerdown", () => {
+          puntos = Math.max(0, puntos + valor);
+          document.getElementById("juego-puntos").textContent = puntos;
+          const r = c.getBoundingClientRect();
+          lanzarParticulas(r.left + r.width / 2, r.top + r.height / 2, {
+            cantidad: valor < 0 ? 10 : 16,
+            colores: valor < 0 ? ["#9a9aa6", "#2a2a33"] : ["#e0364f", "#f5a3b8", "#f6c667"],
+            potencia: 0.6,
+            forma: "circulo",
+            vida: 60,
+          });
+          c.remove();
+        });
+        c.addEventListener("animationend", () => c.remove());
+        juego.append(c);
+      }, 420);
+      const reloj = setInterval(() => {
+        tiempo--;
+        document.getElementById("juego-tiempo").textContent = tiempo;
+        if (tiempo > 0) return;
+        clearInterval(caer);
+        clearInterval(reloj);
+        juego.querySelectorAll(".cae").forEach((c) => c.remove());
+        marcador.hidden = true;
+        const premio =
+          puntos >= 30 ? "¡Récord! Premio: un día entero de mimos ilimitados 🏆❤️"
+          : puntos >= 18 ? "¡Muy bien! Premio: masajito de pies doble 🦶💆‍♀️"
+          : puntos >= 8 ? "Nada mal, manquita 😏 Premio: un beshito en la frente 💋"
+          : "Jajaja manquita confirmada 🎮😂 Premio de consolación: un abrazo igual 🤗";
+        panel.innerHTML = `<p class="juego-tit">Fin del juego</p><h3>${puntos} puntos</h3><p>${premio}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Seguir a mi regalo ♥</button></div>`;
+        panel.hidden = false;
+        panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
+        if (puntos >= 18) fuegosArtificiales(5);
+        logro("minijuego", "🕹️", `Minijuego superado: ${puntos} puntos`);
+      }, 1000);
+    });
+  }
 
   // Pareja animada: salto y lluvia de corazones
   const pareja = document.getElementById("pareja");
