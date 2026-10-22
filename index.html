@@ -3109,7 +3109,7 @@
     place-items: center;
     padding: 16px;
     overflow: hidden;
-    background: rgba(11, 10, 36, 0.88);
+    background: rgba(11, 10, 36, 0.96);
     backdrop-filter: blur(4px);
     animation: subir 0.4s ease both;
     transition: opacity 0.5s;
@@ -3160,6 +3160,69 @@
     cursor: pointer;
     animation: cae linear forwards;
   }
+  .juego-zona { position: relative; z-index: 2; display: grid; place-items: center; width: min(380px, 100%); }
+  .juego-zona[hidden] { display: none; }
+  /* Despierta a la mapachita */
+  .mapachita-juego { text-align: center; width: 100%; }
+  .reloj-mapachita { margin: 0 0 10px; font-family: "Press Start 2P", monospace; font-size: 1.6rem; color: #ff6b85; text-shadow: 0 0 14px rgba(224, 54, 79, 0.7); }
+  .mapachita-cara {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: radial-gradient(circle, #3b1657, #1a1140);
+    font-size: 6rem;
+    line-height: 1;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: transform 0.4s, filter 0.2s;
+  }
+  .mapachita-cara.dormida { transform: rotate(-16deg) translateY(8px); }
+  .mapachita-cara.despierta { animation: bleh 0.35s ease; }
+  .zzz { position: absolute; top: 6px; right: -6px; font-size: 1.1rem; font-weight: 800; color: #b98cff; opacity: 0; transition: opacity 0.3s; }
+  .mapachita-cara.dormida .zzz { opacity: 1; animation: flotar 1.2s ease-in-out infinite; }
+  .sueno { height: 14px; margin: 18px auto 6px; width: 80%; border-radius: 999px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+  .sueno span { display: block; height: 100%; width: 20%; background: linear-gradient(90deg, #7fd16b, #f6c667, #e0364f); transition: width 0.1s linear; }
+  .sueno-txt { margin: 0; font-weight: 800; color: var(--ink); }
+  /* Une los puntos */
+  .une-svg { width: 100%; max-width: 380px; overflow: visible; touch-action: manipulation; }
+  .une-punto { cursor: pointer; }
+  .une-punto circle { fill: #3b1657; stroke: var(--gold); stroke-width: 3; transition: fill 0.3s; }
+  .une-punto text { fill: #fff; font: 800 13px var(--font-body); text-anchor: middle; pointer-events: none; }
+  .une-punto.hecho circle { fill: var(--ember); stroke: #fff; }
+  .une-punto.mal circle { animation: une-mal 0.4s ease; }
+  @keyframes une-mal { 50% { fill: #555; transform: translateX(4px); } }
+  .une-etq { fill: var(--muted); font: 700 12px var(--font-body); text-anchor: middle; }
+  /* Whack-a-White */
+  .agujeros { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; width: 100%; }
+  .agujero {
+    position: relative;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    background: radial-gradient(ellipse at 50% 70%, #050414 40%, #2a1b3d 70%, #3b2a52);
+    box-shadow: inset 0 8px 14px rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .asoma {
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    top: 12%;
+    bottom: 12%;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    background: #555 center / cover;
+    transform: translateY(140%);
+    transition: transform 0.15s ease-out;
+  }
+  .agujero.arriba .asoma { transform: none; }
+  .agujero.golpe { box-shadow: inset 0 0 0 4px #7fd16b; }
+  .agujero.fallo { box-shadow: inset 0 0 0 4px #e0364f; }
   .memoria {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5597,9 +5660,232 @@
     setTimeout(() => regalo.remove(), 1800);
     // A partir de la segunda visita, después del regalo llega el minijuego
     // Los minijuegos se turnan, uno distinto en cada visita a partir de la segunda
-    const MINIJUEGOS = [abrirMinijuego, atraparCoquito, memoriaNosotros];
+    const MINIJUEGOS = [abrirMinijuego, atraparCoquito, despiertaMapachita, memoriaNosotros, unePuntos, whackWhite];
     if (visita >= 2) setTimeout(MINIJUEGOS[(visita - 2) % MINIJUEGOS.length], 2400);
   }, { once: true });
+
+  // Base común de los minijuegos nuevos: pantalla de inicio, marcador, cierre y pantalla final
+  function crearJuego({ titulo, texto, boton = "¡Jugar!" }) {
+    const juego = document.createElement("div");
+    juego.className = "juego";
+    juego.innerHTML = `
+      <div class="juego-panel">
+        <p class="juego-tit">🎮 Minijuego del día</p>
+        <h3>${titulo}</h3>
+        <p>${texto}</p>
+        <div class="juego-botones">
+          <button class="btn-mimo juego-empezar" type="button">${boton}</button>
+          <button class="btn-mimo juego-saltar" type="button">Ahora no</button>
+        </div>
+      </div>
+      <div class="juego-marcador" hidden></div>
+      <div class="juego-zona"></div>`;
+    document.body.append(juego);
+    const panel = juego.querySelector(".juego-panel");
+    const marcador = juego.querySelector(".juego-marcador");
+    const zona = juego.querySelector(".juego-zona");
+    const cerrar = () => {
+      juego.classList.add("fuera");
+      setTimeout(() => juego.remove(), 500);
+    };
+    juego.querySelector(".juego-saltar").addEventListener("click", cerrar);
+    return {
+      juego,
+      zona,
+      marcar: (html) => (marcador.innerHTML = html),
+      alEmpezar: (fn) =>
+        juego.querySelector(".juego-empezar").addEventListener("click", () => {
+          panel.hidden = true;
+          marcador.hidden = false;
+          fn();
+        }),
+      terminar: ({ titulo, texto, boton = "Volver a mi regalo ♥", fuegos = false, logroId, logroTxt, logroIco = "🕹️" }) => {
+        zona.innerHTML = "";
+        marcador.hidden = true;
+        panel.innerHTML = `<p class="juego-tit">Fin del juego</p><h3>${titulo}</h3><p>${texto}</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">${boton}</button></div>`;
+        panel.hidden = false;
+        panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
+        if (fuegos) fuegosArtificiales(6);
+        if (logroId) logro(logroId, logroIco, logroTxt);
+      },
+    };
+  }
+
+  // Minijuego 13 "Despierta a la mapachita": que no se duerma antes de las 4 a.m.
+  function despiertaMapachita() {
+    const j = crearJuego({
+      titulo: "Despierta a la mapachita",
+      texto: "Son las 23:00 y la mapachita quiere aguantar hasta las 4 a.m. 🦝<br>Toca para despertarla cada vez que se le cierren los ojos. ¡Que no se duerma!",
+      boton: "¡Aguantar despierta!",
+    });
+    j.zona.innerHTML = `
+      <div class="mapachita-juego">
+        <p class="reloj-mapachita" id="reloj-mapachita">23:00</p>
+        <button class="mapachita-cara" id="mapachita-cara" type="button" aria-label="Despertar a la mapachita">🦝<span class="zzz">z<br>z z</span></button>
+        <div class="sueno"><span id="barra-sueno"></span></div>
+        <p class="sueno-txt" id="sueno-txt">Sueño</p>
+      </div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let sueno = 20;
+      let minutos = 0;
+      let toques = 0;
+      const cara = document.getElementById("mapachita-cara");
+      const barra = document.getElementById("barra-sueno");
+      const textoSueno = document.getElementById("sueno-txt");
+      j.marcar("Llega a las 04:00 🌙");
+      cara.addEventListener("pointerdown", () => {
+        toques++;
+        sueno = Math.max(0, sueno - 14);
+        cara.classList.remove("despierta");
+        void cara.offsetWidth;
+        cara.classList.add("despierta");
+      });
+      // Cada 100 ms pasan 1,5 minutos del reloj y el sueño sube cada vez más rápido
+      const bucle = setInterval(() => {
+        minutos += 1.5;
+        sueno += 1.2 + minutos / 180;
+        const h = (23 + Math.floor(minutos / 60)) % 24;
+        const m = Math.floor(minutos % 60);
+        document.getElementById("reloj-mapachita").textContent = `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+        barra.style.width = Math.min(100, sueno) + "%";
+        cara.style.filter = `brightness(${1 - Math.min(sueno, 100) / 220})`;
+        cara.classList.toggle("dormida", sueno > 65);
+        textoSueno.textContent = sueno > 80 ? "¡Se está durmiendo! 😴 ¡TOCA!" : sueno > 55 ? "Bosteza… 🥱" : "Bien despierta 👀";
+        if (sueno >= 100) {
+          clearInterval(bucle);
+          j.terminar({
+            titulo: "Se durmió 😴",
+            texto: `Se quedó frita a las ${document.getElementById("reloj-mapachita").textContent}. Leo, desde Argentina: «¡POR FIN! Ya era hora, mocosa 😂❤️»`,
+          });
+        } else if (minutos >= 300) {
+          clearInterval(bucle);
+          j.terminar({
+            titulo: "¡Las 4 a.m.! 🦝",
+            texto: `Mapachita profesional: ${toques} toques para aguantar despierta. Premio: un regaño de Coquito. ¡A DORMIR YA! 😤❤️`,
+            fuegos: true,
+            logroId: "mapachita4am",
+            logroIco: "🌙",
+            logroTxt: "Mapachita nivel experto: despierta hasta las 4 a.m.",
+          });
+        }
+      }, 100);
+    });
+  }
+
+  // Minijuego 4 "Une los puntos": de Argentina a Zaragoza, dibujando un corazón
+  function unePuntos() {
+    const j = crearJuego({
+      titulo: "Une los puntos",
+      texto: "Toca los puntos en orden, del 1 al 12, para unir Argentina con Zaragoza. ¿Qué dibujo saldrá? 👀",
+    });
+    // Puntos sobre un corazón en un lienzo de 300x280
+    const P = [[150, 260], [95, 210], [45, 155], [25, 100], [45, 50], [95, 30], [150, 70], [205, 30], [255, 50], [275, 100], [255, 155], [205, 210]];
+    j.zona.innerHTML = `
+      <svg class="une-svg" viewBox="0 0 300 300" aria-label="Une los puntos">
+        <text x="150" y="292" class="une-etq">📍 Argentina</text>
+        <path id="une-relleno" d="M150 260 L95 210 L45 155 L25 100 L45 50 L95 30 L150 70 L205 30 L255 50 L275 100 L255 155 L205 210 Z" fill="#e0364f" opacity="0"/>
+        <polyline id="une-linea" points="" fill="none" stroke="#f6c667" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        ${P.map(([x, y], i) => `<g class="une-punto" data-i="${i}"><circle cx="${x}" cy="${y}" r="16"/><text x="${x}" y="${y + 5}">${i + 1}</text></g>`).join("")}
+        <text x="150" y="18" class="une-etq">Zaragoza 📍 está en el centro de mi corazón</text>
+      </svg>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let siguiente = 0;
+      const puntos = [];
+      j.marcar("Punto 1 de 12");
+      j.zona.querySelectorAll(".une-punto").forEach((g) =>
+        g.addEventListener("pointerdown", () => {
+          if (+g.dataset.i !== siguiente) {
+            g.classList.remove("mal");
+            void g.getBBox();
+            g.classList.add("mal");
+            return;
+          }
+          g.classList.add("hecho");
+          puntos.push(P[siguiente].join(","));
+          siguiente++;
+          if (siguiente === P.length) puntos.push(P[0].join(","));
+          document.getElementById("une-linea").setAttribute("points", puntos.join(" "));
+          j.marcar(siguiente < P.length ? `Punto ${siguiente + 1} de 12` : "¡Completado! ❤️");
+          if (siguiente === P.length) {
+            document.getElementById("une-relleno").animate([{ opacity: 0 }, { opacity: 0.85 }], { duration: 900, fill: "forwards" });
+            setTimeout(
+              () =>
+                j.terminar({
+                  titulo: "¡Un corazón! ❤️",
+                  texto: "10.000 kilómetros de puntitos… y todos llevan al mismo sitio: a ti. La distancia es solo un dibujo que pronto vamos a borrar.",
+                  fuegos: true,
+                  logroId: "une",
+                  logroIco: "📍",
+                  logroTxt: "Distancia unida: Argentina ❤️ Zaragoza",
+                }),
+              1600
+            );
+          }
+        })
+      );
+    });
+  }
+
+  // Minijuego 7 "Whack-a-White": White sale de los agujeros robando galletas
+  function whackWhite() {
+    const j = crearJuego({
+      titulo: "Whack-a-White",
+      texto: "¡White se está robando las galletas! 🐱🍪<br>Tócalo cuando asome (con cariño). Pero si sale Coquito, ¡no lo toques, que él viene a traer más galletas!",
+    });
+    j.zona.innerHTML = `<div class="agujeros">${Array.from({ length: 9 }, () => `<button class="agujero" type="button"><span class="asoma"></span></button>`).join("")}</div>`;
+    j.zona.hidden = true;
+    j.alEmpezar(() => {
+      j.zona.hidden = false;
+      let puntos = 0;
+      let tiempo = 20;
+      const agujeros = [...j.zona.querySelectorAll(".agujero")];
+      const pintar = () => j.marcar(`🍪 ${puntos} · ${tiempo}s`);
+      pintar();
+      agujeros.forEach((a) =>
+        a.addEventListener("pointerdown", () => {
+          if (!a.classList.contains("arriba")) return;
+          const esLeo = a.dataset.quien === "leo";
+          puntos = Math.max(0, puntos + (esLeo ? -3 : 1));
+          a.classList.remove("arriba");
+          a.classList.add(esLeo ? "fallo" : "golpe");
+          setTimeout(() => a.classList.remove("fallo", "golpe"), 400);
+          pintar();
+        })
+      );
+      const asomar = setInterval(() => {
+        const libres = agujeros.filter((a) => !a.classList.contains("arriba"));
+        if (!libres.length) return;
+        const a = libres[Math.floor(Math.random() * libres.length)];
+        const esLeo = Math.random() < 0.18;
+        a.dataset.quien = esLeo ? "leo" : "white";
+        a.querySelector(".asoma").style.backgroundImage = `url(assets/${esLeo ? "leo-beso" : Math.random() < 0.5 ? "white" : "white-2"}.webp)`;
+        a.classList.add("arriba");
+        setTimeout(() => a.classList.remove("arriba"), Math.max(650, 1100 - (20 - tiempo) * 25));
+      }, 520);
+      const reloj = setInterval(() => {
+        tiempo--;
+        pintar();
+        if (tiempo > 0) return;
+        clearInterval(asomar);
+        clearInterval(reloj);
+        j.terminar({
+          titulo: `${puntos} galletas salvadas 🍪`,
+          texto:
+            puntos >= 15 ? "¡Guardiana de galletas oficial! White te respeta (y te sigue pidiendo una) 😼"
+            : puntos >= 8 ? "Nada mal. White se llevó algunas, pero Coquito trae más 🍪❤️"
+            : "White ganó esta vez 😹 Pero tranqui: el extraño ya viene con más galletas.",
+          fuegos: puntos >= 15,
+          logroId: "whack",
+          logroIco: "🐱",
+          logroTxt: "Whack-a-White: galletas defendidas",
+        });
+      }, 1000);
+    });
+  }
 
   // Minijuego "Memoria de nosotros": encontrar las 6 parejas
   function memoriaNosotros() {
