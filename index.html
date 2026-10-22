@@ -3159,6 +3159,37 @@
     cursor: pointer;
     animation: cae linear forwards;
   }
+  .coquito-huye {
+    position: absolute;
+    z-index: 2;
+    width: 86px;
+    height: 86px;
+    padding: 0;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: #222;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5), 0 0 24px rgba(245, 163, 184, 0.5);
+    transition: left 0.35s cubic-bezier(0.3, 1.4, 0.5, 1), top 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+    touch-action: manipulation;
+  }
+  .coquito-huye[hidden] { display: none; }
+  .coquito-huye img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: 50% 30%; pointer-events: none; }
+  .coquito-huye.pillado { animation: bleh 0.4s ease; }
+  .coquito-dice {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #fff;
+    color: #2a0e3e;
+    font-size: 0.75rem;
+    font-weight: 800;
+    white-space: nowrap;
+    pointer-events: none;
+  }
   @keyframes cae { to { transform: translateY(calc(100vh + 80px)) rotate(25deg); } }
   .regalo-visita { font-size: 0.7rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
   .regalo-nota {
@@ -5519,8 +5550,103 @@
     }, 900);
     setTimeout(() => regalo.remove(), 1800);
     // A partir de la segunda visita, después del regalo llega el minijuego
-    if (visita >= 2) setTimeout(abrirMinijuego, 2400);
+    // Se turnan los dos minijuegos: visitas pares, besitos; impares, atrapar a Coquito
+    if (visita >= 2) setTimeout(visita % 2 === 0 ? abrirMinijuego : atraparCoquito, 2400);
   }, { once: true });
+
+  // Minijuego "¡Atrapa a Coquito!": tocar 8 veces su cara, que salta cada vez más rápido
+  function atraparCoquito() {
+    const META = 8;
+    const juego = document.createElement("div");
+    juego.className = "juego";
+    juego.innerHTML = `
+      <div class="juego-panel">
+        <p class="juego-tit">🎮 Minijuego del día</p>
+        <h3>¡Atrapa a Coquito!</h3>
+        <p>Tu Coquito se escapa saltando por la pantalla.<br>Atrápalo ${META} veces en 20 segundos y te dará besitos 💋</p>
+        <div class="juego-botones">
+          <button class="btn-mimo juego-empezar" type="button">¡A por él!</button>
+          <button class="btn-mimo juego-saltar" type="button">Ahora no</button>
+        </div>
+      </div>
+      <div class="juego-marcador" hidden><span id="atrapes">0</span>/${META} · <span id="tiempo-atrapa">20</span>s</div>
+      <button class="coquito-huye" type="button" hidden aria-label="Coquito"><img src="assets/leo-beso.webp" alt=""><span class="coquito-dice"></span></button>`;
+    document.body.append(juego);
+    const panel = juego.querySelector(".juego-panel");
+    const marcador = juego.querySelector(".juego-marcador");
+    const coquito = juego.querySelector(".coquito-huye");
+    const dice = coquito.querySelector(".coquito-dice");
+    const cerrar = () => {
+      juego.classList.add("fuera");
+      setTimeout(() => juego.remove(), 500);
+    };
+    juego.querySelector(".juego-saltar").addEventListener("click", cerrar);
+    const FRASES = ["¡Muack! 💋", "¡No me pillas! 😝", "Uy, casi 😏", "¡Otro beso! 😘", "Manquita no, ¡pro! 🎮", "¡Me rindo… no! 🏃‍♂️", "Ya casi soy tuyo 🥺", "¡Atrapado! ❤️"];
+    let atrapes = 0;
+    let tiempo = 20;
+    let salto;
+    let reloj;
+    const mover = () => {
+      // Margen a los lados para que su bocadillo no se salga de la pantalla
+      const w = Math.max(40, juego.clientWidth - 190);
+      const h = Math.max(120, juego.clientHeight - 170);
+      coquito.style.left = 50 + Math.random() * w + "px";
+      coquito.style.top = 60 + Math.random() * h + "px";
+    };
+    const terminar = (gano) => {
+      clearInterval(salto);
+      clearInterval(reloj);
+      coquito.hidden = true;
+      marcador.hidden = true;
+      panel.innerHTML = gano
+        ? `<p class="juego-tit">¡Ganaste!</p><h3>Me atrapaste 😳❤️</h3><p>Premio: ${META} besitos ya, y todos los que quieras cuando estemos juntos. Ahora soy tuyo para siempre.</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Cobrar mis besitos 💋</button></div>`
+        : `<p class="juego-tit">Se acabó el tiempo</p><h3>${atrapes}/${META} 😝</h3><p>Me escapé… pero te dejo ${atrapes} besitos igual. Mañana revancha, manquita 🎮</p><div class="juego-botones"><button class="btn-mimo juego-saltar" type="button">Volver a mi regalo ♥</button></div>`;
+      panel.hidden = false;
+      panel.querySelector(".juego-saltar").addEventListener("click", cerrar);
+      if (gano) {
+        fuegosArtificiales(6);
+        logro("atrapa", "🏃‍♂️", "Coquito atrapado: besitos para siempre");
+      }
+    };
+    coquito.addEventListener("pointerdown", () => {
+      atrapes++;
+      document.getElementById("atrapes").textContent = atrapes;
+      dice.textContent = FRASES[(atrapes - 1) % FRASES.length];
+      coquito.classList.remove("pillado");
+      void coquito.offsetWidth;
+      coquito.classList.add("pillado");
+      const r = coquito.getBoundingClientRect();
+      for (let i = 0; i < 5; i++) {
+        const b = document.createElement("span");
+        b.className = "beso-volador";
+        b.textContent = i % 2 ? "💋" : "❤️";
+        b.style.left = r.left + r.width / 2 + "px";
+        b.style.top = r.top + r.height / 2 + "px";
+        b.style.setProperty("--dx", (Math.random() - 0.5) * 160 + "px");
+        b.style.setProperty("--rot", (Math.random() - 0.5) * 60 + "deg");
+        document.body.append(b);
+        setTimeout(() => b.remove(), 1600);
+      }
+      if (atrapes >= META) return terminar(true);
+      // Cada vez salta antes: empieza cada 1,3 s y acaba casi a 0,6 s
+      clearInterval(salto);
+      setTimeout(mover, 250);
+      salto = setInterval(mover, Math.max(600, 1300 - atrapes * 90));
+    });
+    juego.querySelector(".juego-empezar").addEventListener("click", () => {
+      panel.hidden = true;
+      marcador.hidden = false;
+      coquito.hidden = false;
+      dice.textContent = "¡A que no me pillas! 😜";
+      mover();
+      salto = setInterval(mover, 1300);
+      reloj = setInterval(() => {
+        tiempo--;
+        document.getElementById("tiempo-atrapa").textContent = tiempo;
+        if (tiempo <= 0) terminar(false);
+      }, 1000);
+    });
+  }
 
   // Minijuego "Atrapa los besitos": 15 segundos tocando lo que cae
   function abrirMinijuego() {
