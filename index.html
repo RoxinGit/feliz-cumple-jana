@@ -1618,18 +1618,31 @@
     font-weight: 700;
     font-size: clamp(3.2rem, 14vw, 6.4rem);
     line-height: 1.05;
-    filter: drop-shadow(0 0 18px rgba(245, 163, 184, 0.45)) drop-shadow(0 4px 0 rgba(42, 14, 62, 0.6));
+    /* La regla original del título le ponía un degradado recortado al texto; aquí cada letra tiene su color */
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--gold);
   }
-  /* Cada letra lleva un degradado que se desplaza, como un brillo que recorre el nombre */
+  /* Cada letra cambia de color con un pequeño desfase, como una ola de color que recorre el nombre
+     (color liso en vez de degradado recortado: con la letra manuscrita el recorte se pintaba mal) */
   .titulo em .letra {
-    background: linear-gradient(100deg, var(--gold) 0%, #fff3d6 25%, var(--rose) 50%, var(--ember) 75%, var(--gold) 100%);
-    background-size: 300% 100%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: ola 2.4s ease-in-out infinite, degradado-titulo 6s linear infinite;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: var(--gold);
+    text-shadow: 0 0 16px rgba(245, 163, 184, 0.55);
+    animation-name: ola, color-titulo;
+    animation-duration: 2.4s, 4s;
+    animation-timing-function: ease-in-out, ease-in-out;
+    animation-iteration-count: infinite, infinite;
   }
-  @keyframes degradado-titulo { to { background-position: 300% 0; } }
+  @keyframes color-titulo {
+    0%, 100% { color: var(--gold); }
+    33% { color: #ffd7e0; }
+    66% { color: var(--rose); }
+    83% { color: #ff6b85; }
+  }
   .destello { position: absolute; color: var(--gold); pointer-events: none; animation: destello 2.2s ease-in-out infinite; }
   .destello.d1 { top: 8%; left: 0; font-size: 1.4rem; }
   .destello.d2 { top: 30%; right: 0; font-size: 1.1rem; animation-delay: -0.6s; color: var(--rose); }
